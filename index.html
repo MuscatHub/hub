@@ -71,6 +71,10 @@ tr.click{cursor:pointer}tr.click:hover td{background:#F8F9FB}
 .seg{display:flex;gap:6px;flex-wrap:wrap}.seg label{display:flex;align-items:center;gap:6px;height:38px;padding:0 12px;border:1px solid #E1E3EA;border-radius:10px;font-weight:500;color:#14161C;cursor:pointer}
 .seg input{accent-color:#E2B53E}
 .step{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.lb{position:fixed;inset:0;z-index:9999;background:rgba(10,12,16,.86);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+.lb img{max-width:96vw;max-height:92vh;object-fit:contain;border-radius:12px;background:#fff;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.lb .x{position:absolute;top:16px;right:20px;color:#fff;font:600 28px Inter,sans-serif;background:none;border:0;cursor:pointer}
+img[data-zoom]{cursor:zoom-in}
 .loading{display:flex;align-items:center;justify-content:center;height:60vh;color:#5E6472;gap:12px}
 .spin{width:22px;height:22px;border:3px solid #E1E3EA;border-top-color:#E2B53E;border-radius:50%;animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
@@ -105,7 +109,7 @@ function num(n,d){return (Number(n)||0).toLocaleString('en-US',{minimumFractionD
 function gr(n){return num(n,2)+' g';}
 function dt(s){if(!s)return '—';var p=String(s).split('-');if(p.length<3)return esc(s);var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return (+p[2])+' '+m[+p[1]-1]+' '+p[0];}
 function ini(s){s=String(s||'?').replace(/[^A-Za-z0-9 ]/g,' ').trim().split(/\s+/);return ((s[0]||'?')[0]+((s[1]||'')[0]||(s[0]||'')[1]||'')).toUpperCase();}
-function thumb(img,metal,label,size){var st=size?'width:'+size+'px;height:'+size+'px':'';return '<div class="thumb'+(metal==='Silver'?' sv':'')+'" style="'+st+'">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy">':esc(ini(label)))+'</div>';}
+function thumb(img,metal,label,size){var st=size?'width:'+size+'px;height:'+size+'px':'';return '<div class="thumb'+(metal==='Silver'?' sv':'')+'" style="'+st+'">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy" data-zoom="1">':esc(ini(label)))+'</div>';}
 function statusChip(o){var s=o.status||'';var c=/Partially/.test(s)?'c-part':/open\)/.test(s)?'c-open':/Shipped/.test(s)?'c-ship':/Proforma/.test(s)?'c-pro':'c-prod';return '<span class="chip '+c+'">'+esc(s)+'</span>';}
 function appLink(view,label,cls){return '<a class="btn '+(cls||'ghost')+'" href="'+esc(D.appUrl+'&view='+encodeURIComponent(view))+'" target="_blank" rel="noopener">'+label+'</a>';}
 function topBar(t,sub,extra,noSearch){return '<div class="top"><div><h1>'+t+'</h1><div class="sub">'+sub+'</div></div>'+(noSearch?'<span style="margin-left:auto"></span>':'<label class="search">'+ic('search')+'<input id="q" aria-label="Search" placeholder="Search orders, SKUs, customers" value="'+esc(S.q)+'" oninput="S.q=this.value;draw(true)"></label>')+(extra||'')+'<button class="btn ghost" onclick="load()" aria-label="Refresh data">'+ic('refresh')+'</button></div>';}
@@ -139,7 +143,7 @@ function moveRow(m){var amt=m.paid?money(m.paid,2):(m.labor+m.other)?money(m.lab
 function products(){var list=D.products.filter(function(p){return (S.catTab==='all'||p.metal===S.catTab)&&match(p.sku+' '+p.name+' '+p.cat);});
  var h=topBar('Products',num(D.products.length)+' products · gold and silver catalog','<button class="btn ghost" onclick="openImport(\'productImport\')">'+ic('up')+'Excel upload</button><button class="btn gold" onclick="openProduct()">'+ic('plus')+'Add product</button>');
  h+='<div class="tabs">'+[['all','All ('+num(D.products.length)+')'],['Gold','Gold ('+num(D.products.filter(function(p){return p.metal==='Gold';}).length)+')'],['Silver','Silver ('+num(D.products.filter(function(p){return p.metal==='Silver';}).length)+')']].map(function(t){return '<button class="tab'+(S.catTab===t[0]?' on':'')+'" onclick="S.catTab=\''+t[0]+'\';draw()">'+t[1]+'</button>';}).join('')+'<span class="muted" style="align-self:center;margin-left:8px">'+num(list.length)+' shown</span></div>';
- h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">'+list.map(function(p){return '<article class="card pcard" style="padding:0;overflow:hidden"><div class="prod-img" style="background:'+(p.metal==='Silver'?'#EEF1F5':'#F6F0E1')+'">'+(p.img?'<img src="'+esc(p.img)+'" alt="'+esc(p.sku)+'" loading="lazy" decoding="async">':'<span class="muted">No photo</span>')+'</div><div class="pb"><div class="pt"><b style="font-family:Manrope,sans-serif" title="'+esc(p.sku)+'">'+esc(p.sku)+'</b><span class="chip '+(p.metal==='Silver'?'c-pro':'c-prod')+'" style="margin-left:auto;flex:none">'+p.metal+'</span></div><div class="muted pn" title="'+esc(p.name)+'">'+esc(p.name)+'</div><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:700">'+(p.cost?'<span class="muted" style="font-weight:600;margin-right:4px">Est.</span>'+money(p.cost,2):'—')+'</span><span class="muted">'+(p.gram?num(p.gram,2)+' g':'')+'</span></div><div class="pa">'+'<button class="btn ghost sm" onclick="openProduct(\''+p.metal+'\',\''+esc(p.id)+'\',\'edit\')">Edit</button><button class="btn ghost sm" onclick="openProduct(\''+p.metal+'\',\''+esc(p.id)+'\',\'dup\')">'+ic('copy',16)+'Duplicate</button>'+'<button class="btn sm full" '+(S.busy['p'+p.metal+p.id]?'disabled style="opacity:.5"':'')+' onclick="addToBasket(\''+p.metal+'\',\''+esc(p.id)+'\')">'+ic('plus',16)+'Add to basket</button>'+'</div></div></article>';}).join('')+'</div>';
+ h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px">'+list.map(function(p){return '<article class="card pcard" style="padding:0;overflow:hidden"><div class="prod-img" style="background:'+(p.metal==='Silver'?'#EEF1F5':'#F6F0E1')+'">'+(p.img?'<img src="'+esc(p.img)+'" alt="'+esc(p.sku)+'" loading="lazy" decoding="async" data-zoom="1">':'<span class="muted">No photo</span>')+'</div><div class="pb"><div class="pt"><b style="font-family:Manrope,sans-serif" title="'+esc(p.sku)+'">'+esc(p.sku)+'</b><span class="chip '+(p.metal==='Silver'?'c-pro':'c-prod')+'" style="margin-left:auto;flex:none">'+p.metal+'</span></div><div class="muted pn" title="'+esc(p.name)+'">'+esc(p.name)+'</div><div style="display:flex;align-items:center;gap:8px"><span style="font-weight:700">'+(p.cost?'<span class="muted" style="font-weight:600;margin-right:4px">Est.</span>'+money(p.cost,2):'—')+'</span><span class="muted">'+(p.gram?num(p.gram,2)+' g':'')+'</span></div><div class="pa">'+'<button class="btn ghost sm" onclick="openProduct(\''+p.metal+'\',\''+esc(p.id)+'\',\'edit\')">Edit</button><button class="btn ghost sm" onclick="openProduct(\''+p.metal+'\',\''+esc(p.id)+'\',\'dup\')">'+ic('copy',16)+'Duplicate</button>'+'<button class="btn sm full" '+(S.busy['p'+p.metal+p.id]?'disabled style="opacity:.5"':'')+' onclick="addToBasket(\''+p.metal+'\',\''+esc(p.id)+'\')">'+ic('plus',16)+'Add to basket</button>'+'</div></div></article>';}).join('')+'</div>';
  if(!list.length)h+='<p class="muted" style="margin-top:16px">No products match this search.</p>';
  return h;}
 
@@ -472,6 +476,15 @@ function saveFin(){var t=fv('fn_t');if(t!=='Cash In'&&!fv('fn_u')){toast('Choose
  .then(function(r){closeModal();toast(t+' saved'+(r.rows>1?' with payment':'')+' · balances refresh in about a minute');load();})
  .catch(function(e){var b=document.getElementById('fn_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent='Save';}toast('Not saved: '+(e.message||e));});}
 nav();load();
+/* ---------- image zoom ---------- */
+function bigImg(u){u=String(u||'');return u.replace(/=s\d+(-c)?$/,'=s1600').replace(/([?&])width=\d+&?/,'$1').replace(/[?&]$/,'');}
+function zoomImg(src){closeZoom();var d=document.createElement('div');d.className='lb';d.id='lb';d.setAttribute('role','dialog');d.setAttribute('aria-label','Image preview');
+ var im=document.createElement('img');im.src=bigImg(src);im.alt='';im.onerror=function(){if(im.src!==src)im.src=src;};
+ var x=document.createElement('button');x.className='x';x.setAttribute('aria-label','Close');x.textContent='\u00d7';
+ d.appendChild(im);d.appendChild(x);d.onclick=closeZoom;document.body.appendChild(d);}
+function closeZoom(){var d=document.getElementById('lb');if(d)d.remove();}
+document.addEventListener('click',function(e){var t=e.target;if(t&&t.tagName==='IMG'&&t.hasAttribute('data-zoom')){e.preventDefault();e.stopPropagation();zoomImg(t.currentSrc||t.src);}},true);
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeZoom();});
 </script>
 </body>
 </html>
