@@ -1,0 +1,26 @@
+{
+  "name": "Muscat Hub",
+  "short_name": "Muscat Hub",
+  "description": "Orders, production, shipments and finance for Muscat",
+  "id": "/hub/",
+  "start_url": "/hub/",
+  "scope": "/hub/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FFFFFF",
+  "theme_color": "#14161C",
+  "icons": [
+    {
+      "src": "https://cdn.shopify.com/s/files/1/0847/5865/9365/files/Untitled_design_14_bd6496fc-2997-4645-9093-db5bd5151f7d.png?width=192&height=192&pad_color=ffffff&format=png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn.shopify.com/s/files/1/0847/5865/9365/files/Untitled_design_14_bd6496fc-2997-4645-9093-db5bd5151f7d.png?width=512&height=512&pad_color=ffffff&format=png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
