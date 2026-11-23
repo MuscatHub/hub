@@ -97,6 +97,8 @@ img[data-zoom]{cursor:zoom-in}
 .pcard .pa{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
 .pcard .pa .btn{width:100%;justify-content:center;padding:0 8px;min-width:0;overflow:hidden}
 .pcard .pa .full{grid-column:1/-1}
+.row.mv{cursor:pointer;border-radius:10px}.row.mv:hover{background:#F8F9FB}
+.mvt td,.mvt th{padding:8px 6px}
 .note{background:#FFF8E6;border:1px solid #F3E2B0;color:#5C4304;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:16px}
 @media (max-width:900px){.shell{flex-direction:column}.side{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;padding:12px}.brand{padding:8px 12px;width:100%}.price{display:none}.nl{width:auto}.main{padding:20px 16px}.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.search{margin-left:0;min-width:0;width:100%}}
 
@@ -186,7 +188,7 @@ img[data-zoom]{cursor:zoom-in}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-23-18';
+var APPV='2026-11-24-19';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -226,7 +228,7 @@ function home(){var oo=openOrders(), inprod=oo.filter(function(o){return /produc
  h+='<section class="card" style="flex:1 1 320px"><h2 class="h2">Recent activity</h2>'+D.finance.moves.slice(0,7).map(moveRow).join('')+'</section></div>';
  return h;}
 function moveRow(m){var amt=m.paid?money(m.paid,2):(m.labor+m.other)?money(m.labor+m.other,2):m.silver?gr(m.silver)+' silver':m.gold?gr(m.gold)+' gold':'—';
- return '<div class="row"><div style="flex:1;min-width:0"><div style="font-weight:600">'+esc(m.usta)+' <span class="muted">· '+esc(m.kind)+'</span></div><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+dt(m.date)+' · '+esc(m.desc)+'</div></div><div style="font-weight:700;font-family:Manrope,sans-serif;white-space:nowrap">'+amt+'</div></div>';}
+ return '<div class="row mv" role="button" tabindex="0" onclick="openMove('+D.finance.moves.indexOf(m)+')" onkeydown="if(event.key===\'Enter\')openMove('+D.finance.moves.indexOf(m)+')"><div style="flex:1;min-width:0"><div style="font-weight:600">'+esc(m.usta)+' <span class="muted">· '+esc(m.kind)+'</span></div><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+dt(m.date)+' · '+esc(m.desc)+'</div></div><div style="font-weight:700;font-family:Manrope,sans-serif;white-space:nowrap">'+amt+'</div></div>';}
 
 /* ---------- PRODUCTS ---------- */
 function products(){var list=D.products.filter(function(p){return (S.catTab==='all'||p.metal===S.catTab)&&match(p.sku+' '+p.name+' '+p.cat);});
@@ -309,6 +311,20 @@ function finance(){var f=D.finance, cover=f.owed?Math.round(f.cash/f.owed*100):1
 var PAGES={home:home,products:products,basket:basket,orders:orders,prod:prod,ship:ship,finance:finance};
 function isPhone(){return window.matchMedia&&matchMedia('(max-width:760px)').matches;}
 function selOrder(no){S.sel=no;draw();if(isPhone()){var d=document.getElementById('odetail');if(d)d.scrollIntoView({behavior:'smooth',block:'start'});}}
+/* finance activity detail */
+function openMove(i){var m=D.finance.moves[i];if(!m)return;
+ var tiles=[['Pieces',m.qty?num(m.qty):''],['Product grams',m.gram?gr(m.gram):''],['Labor',m.labor?money(m.labor,2):''],['Silver',m.silver?gr(m.silver):''],['Fine gold',m.gold?gr(m.gold):''],['Other',m.other?money(m.other,2):''],['Cash paid',m.paid?money(m.paid,2):''],['Gram price used',m.gprice?money(m.gprice,2)+'/g':'']].filter(function(x){return x[1];});
+ var calc=[];if(m.gram&&m.labor)calc.push('Labor = '+num(m.gram,2)+' g × $'+num(m.labor/m.gram,2)+'/g');if(m.gram&&m.silver)calc.push('Silver = '+num(m.gram,2)+' g × '+num(m.silver/m.gram,3));if(m.gram&&m.gold)calc.push('Fine gold = '+num(m.gram,2)+' g × '+num(m.gold/m.gram,3));
+ var h=mhead(esc(m.usta)+' · '+esc(m.kind),esc(dt(m.date))+(m.n>1?' · '+m.n+' entries combined':''));
+ h+='<p style="margin:0 0 14px;white-space:pre-wrap">'+esc(m.desc)+'</p>';
+ h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px">'+tiles.map(function(x){return '<div class="tile"><div class="muted">'+x[0]+'</div><b style="font-size:17px">'+x[1]+'</b></div>';}).join('')+'</div>';
+ if(calc.length)h+='<p class="muted" style="margin:12px 0 0">'+calc.map(esc).join('<br>')+'</p>';
+ if(m.not)h+='<p class="muted" style="margin:10px 0 0">Note: '+esc(m.not)+'</p>';
+ if(m.items&&m.items.length>1){h+='<h2 class="h2" style="margin-top:20px">Breakdown · '+m.items.length+' products</h2><div style="overflow-x:auto"><table class="mvt"><thead><tr><th>Product</th><th style="text-align:right">Pcs</th><th style="text-align:right">Grams</th><th style="text-align:right">Labor</th><th style="text-align:right">Silver</th></tr></thead><tbody>'
+  +m.items.map(function(x){var p=String(x.desc||'').split(' · ');return '<tr><td><b>'+esc(p[p.length-1])+'</b><div class="muted">'+esc(dt(x.date))+'</div></td><td style="text-align:right">'+num(x.qty)+'</td><td style="text-align:right">'+num(x.gram,2)+'</td><td style="text-align:right">'+money(x.labor,2)+'</td><td style="text-align:right">'+num(x.silver,2)+'</td></tr>';}).join('')
+  +'<tr><td><b>Total</b></td><td style="text-align:right"><b>'+num(m.qty)+'</b></td><td style="text-align:right"><b>'+num(m.gram,2)+'</b></td><td style="text-align:right"><b>'+money(m.labor,2)+'</b></td><td style="text-align:right"><b>'+num(m.silver,2)+'</b></td></tr></tbody></table></div>';}
+ h+='<div style="display:flex;justify-content:flex-end;margin-top:18px"><button class="btn" onclick="closeModal()">Close</button></div>';
+ modal(h);}
 function draw(keepFocus){nav();if(!D)return;var m=document.getElementById('main');var had=keepFocus&&document.activeElement&&document.activeElement.id==='q';var pos=had?document.activeElement.selectionStart:0;m.innerHTML=PAGES[S.page]();if(had){var q=document.getElementById('q');if(q){q.focus();q.setSelectionRange(pos,pos);}}}
 var API='https://script.google.com/macros/s/AKfycbxp-ICFFy396THVc5tRMRhtWMIjYr4OyKM3nQh8x1PiBmgO20kaF9rIIpw6zC0mzk2UlQ/exec';
 function store(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
