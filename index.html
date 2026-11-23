@@ -188,7 +188,7 @@ img[data-zoom]{cursor:zoom-in}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-24-19';
+var APPV='2026-11-24-20';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -227,8 +227,9 @@ function home(){var oo=openOrders(), inprod=oo.filter(function(o){return /produc
  h+='<h2 class="h2" style="margin-top:26px">Due soon</h2>'+due.map(function(o){return '<div class="row" style="cursor:pointer" onclick="S.sel=\''+o.no+'\';go(\'orders\')"><div class="thumb'+(o.metal==='Silver'?' sv':'')+'">'+esc(ini(o.cust))+'</div><div style="flex:1;min-width:0"><div style="font-weight:600">'+esc(o.no)+' · '+esc(o.cust)+'</div><div class="muted">'+num(o.shipped)+' / '+num(o.qty)+' pcs shipped · '+esc(o.metal)+(o.usta?' · '+esc(o.usta):'')+'</div></div><span class="chip c-prod">Due '+dt(o.due)+'</span></div>';}).join('')+'</section>';
  h+='<section class="card" style="flex:1 1 320px"><h2 class="h2">Recent activity</h2>'+D.finance.moves.slice(0,7).map(moveRow).join('')+'</section></div>';
  return h;}
-function moveRow(m){var amt=m.paid?money(m.paid,2):(m.labor+m.other)?money(m.labor+m.other,2):m.silver?gr(m.silver)+' silver':m.gold?gr(m.gold)+' gold':'—';
- return '<div class="row mv" role="button" tabindex="0" onclick="openMove('+D.finance.moves.indexOf(m)+')" onkeydown="if(event.key===\'Enter\')openMove('+D.finance.moves.indexOf(m)+')"><div style="flex:1;min-width:0"><div style="font-weight:600">'+esc(m.usta)+' <span class="muted">· '+esc(m.kind)+'</span></div><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+dt(m.date)+' · '+esc(m.desc)+'</div></div><div style="font-weight:700;font-family:Manrope,sans-serif;white-space:nowrap">'+amt+'</div></div>';}
+function moveRow(m){var top=m.paid?money(m.paid,2)+' paid':(m.labor+m.other)?money(m.labor+m.other,2):'', g=[m.silver?gr(m.silver)+' silver':'',m.gold?gr(m.gold)+' gold':''].filter(Boolean);
+ var amt=(top?'<div>'+top+'</div>':'')+(g.length?'<div style="'+(top?'font-size:13px;font-weight:600;color:#4A5A72;margin-top:2px':'')+'">'+g.join(' · ')+'</div>':'')||'—';
+ return '<div class="row mv" role="button" tabindex="0" onclick="openMove('+D.finance.moves.indexOf(m)+')" onkeydown="if(event.key===\'Enter\')openMove('+D.finance.moves.indexOf(m)+')"><div style="flex:1;min-width:0"><div style="font-weight:600">'+esc(m.usta)+' <span class="muted">· '+esc(m.kind)+'</span></div><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+dt(m.date)+' · '+esc(m.desc)+'</div></div><div style="font-weight:700;font-family:Manrope,sans-serif;white-space:nowrap;text-align:right">'+amt+'</div></div>';}
 
 /* ---------- PRODUCTS ---------- */
 function products(){var list=D.products.filter(function(p){return (S.catTab==='all'||p.metal===S.catTab)&&match(p.sku+' '+p.name+' '+p.cat);});
