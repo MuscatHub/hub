@@ -99,7 +99,7 @@ img[data-zoom]{cursor:zoom-in}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-23-14';
+var APPV='2026-11-23-15';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -231,8 +231,14 @@ function load(){checkVer();var m=location.hash.match(/k=([^&]+)/);if(m){store('h
  setSync('Updating…');
  fetch(API+'?api='+encodeURIComponent(key)).then(function(r){return r.json();}).then(function(j){
   if(!j.ok){if(/access/i.test(j.error)){store('hubKey',null);store('hubData',null);D=null;keyForm('That key did not work. Try again.');}else fail(j.error);return;}
-  D=j.data;store('hubData',JSON.stringify(D));draw(true);setSync('');
+  D=j.data;store('hubData',JSON.stringify(D));draw(true);setSync('');fillImgs();
  }).catch(function(e){fail(e&&e.message||e);});}
+/* Drive photos (customer photos, catalog photos without a web link) come through the script as data URLs */
+var IMGC={};
+function applyImgs(){if(!D)return 0;var n=0;D.lines.concat(D.products).forEach(function(x){if(!x.img&&x.photo&&IMGC[x.photo]){x.img=IMGC[x.photo];n++;}});return n;}
+function fillImgs(){if(!D)return;if(applyImgs())draw(true);var need=[];D.lines.concat(D.products).forEach(function(x){if(!x.img&&x.photo&&IMGC[x.photo]===undefined&&need.indexOf(x.photo)<0)need.push(x.photo);});
+ for(var i=0,ch=[];i<need.length;i+=30)ch.push(need.slice(i,i+30));
+ ch.reduce(function(pr,c){return pr.then(function(){return post({op:'img',paths:c}).then(function(r){c.forEach(function(k){IMGC[k]=(r&&r.imgs||{})[k]||'';});if(applyImgs())draw(true);}).catch(function(){});});},Promise.resolve());}
 function fail(msg){if(D){setSync('Could not refresh. Showing data from '+D.at+'.');return;}document.getElementById('main').innerHTML='<div class="card"><h2 class="h2">Could not load data</h2><p class="muted">'+esc(msg)+'</p><button class="btn" onclick="load()">Try again</button></div>';}
 function setSync(t){var s=document.getElementById('sync');if(!s){s=document.createElement('div');s.id='sync';s.setAttribute('role','status');s.style.cssText='position:fixed;right:16px;bottom:16px;background:#14161C;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:9;display:none';document.body.appendChild(s);}s.textContent=t;s.style.display=t?'block':'none';}
 function post(body,done){body.key=store('hubKey');return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json();}).then(function(j){if(!j.ok)throw new Error(j.error);return j.result;});}
