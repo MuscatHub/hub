@@ -129,9 +129,9 @@ function moveRow(m){var amt=m.paid?money(m.paid,2):(m.labor+m.other)?money(m.lab
 
 /* ---------- PRODUCTS ---------- */
 function products(){var list=D.products.filter(function(p){return (S.catTab==='all'||p.metal===S.catTab)&&match(p.sku+' '+p.name+' '+p.cat);});
- var h=topBar('Products',num(D.products.length)+' products · gold and silver catalog',appLink('Product Uploads',ic('up')+'Excel upload')+appLink('Products',ic('plus')+'Add product','gold'));
+ var h=topBar('Products',num(D.products.length)+' products · gold and silver catalog','<button class="btn ghost" onclick="openImport(\'productImport\')">'+ic('up')+'Excel upload</button><button class="btn gold" onclick="openProduct()">'+ic('plus')+'Add product</button>');
  h+='<div class="tabs">'+[['all','All'],['Gold','Gold'],['Silver','Silver']].map(function(t){return '<button class="tab'+(S.catTab===t[0]?' on':'')+'" onclick="S.catTab=\''+t[0]+'\';draw()">'+t[1]+'</button>';}).join('')+'<span class="muted" style="align-self:center;margin-left:8px">'+num(list.length)+' shown</span></div>';
- h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">'+list.slice(0,120).map(function(p){return '<article class="card" style="padding:0;overflow:hidden"><div class="prod-img" style="background:'+(p.metal==='Silver'?'#EEF1F5':'#F6F0E1')+'">'+(p.img?'<img src="'+esc(p.img)+'" alt="'+esc(p.sku)+'" loading="lazy">':'<span class="muted">No photo</span>')+'</div><div style="padding:14px 16px"><div style="display:flex;align-items:center;gap:8px"><b style="font-family:Manrope,sans-serif">'+esc(p.sku)+'</b><span class="chip '+(p.metal==='Silver'?'c-pro':'c-prod')+'" style="margin-left:auto">'+p.metal+'</span></div><div class="muted" style="margin-top:4px;min-height:34px">'+esc(p.name)+'</div><div style="display:flex;align-items:center;gap:8px;margin-top:10px"><span style="font-weight:700">'+(p.cost?money(p.cost,2):'—')+'</span><span class="muted">'+(p.gram?num(p.gram,2)+' g':'')+'</span></div><div style="display:flex;gap:8px;margin-top:10px">'+appLink('Products',ic('copy',16)+'Duplicate','ghost sm')+'<button class="btn sm" '+(S.busy['p'+p.metal+p.id]?'disabled style="opacity:.5"':'')+' onclick="addToBasket(\''+p.metal+'\',\''+esc(p.id)+'\')">'+ic('plus',16)+'Basket</button>'+'</div></div></article>';}).join('')+'</div>';
+ h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">'+list.slice(0,120).map(function(p){return '<article class="card" style="padding:0;overflow:hidden"><div class="prod-img" style="background:'+(p.metal==='Silver'?'#EEF1F5':'#F6F0E1')+'">'+(p.img?'<img src="'+esc(p.img)+'" alt="'+esc(p.sku)+'" loading="lazy">':'<span class="muted">No photo</span>')+'</div><div style="padding:14px 16px"><div style="display:flex;align-items:center;gap:8px"><b style="font-family:Manrope,sans-serif">'+esc(p.sku)+'</b><span class="chip '+(p.metal==='Silver'?'c-pro':'c-prod')+'" style="margin-left:auto">'+p.metal+'</span></div><div class="muted" style="margin-top:4px;min-height:34px">'+esc(p.name)+'</div><div style="display:flex;align-items:center;gap:8px;margin-top:10px"><span style="font-weight:700">'+(p.cost?money(p.cost,2):'—')+'</span><span class="muted">'+(p.gram?num(p.gram,2)+' g':'')+'</span></div><div style="display:flex;gap:8px;margin-top:10px">'+'<button class="btn ghost sm" onclick="openProduct(\''+p.metal+'\',\''+esc(p.id)+'\',\'edit\')">Edit</button><button class="btn ghost sm" onclick="openProduct(\''+p.metal+'\',\''+esc(p.id)+'\',\'dup\')">'+ic('copy',16)+'Duplicate</button>'+'<button class="btn sm" '+(S.busy['p'+p.metal+p.id]?'disabled style="opacity:.5"':'')+' onclick="addToBasket(\''+p.metal+'\',\''+esc(p.id)+'\')">'+ic('plus',16)+'Basket</button>'+'</div></div></article>';}).join('')+'</div>';
  if(list.length>120)h+='<p class="muted" style="margin-top:16px">Showing the first 120. Search to narrow down.</p>';
  return h;}
 
@@ -147,7 +147,7 @@ function orders(){var tabs=[['open','Open'],['prod','In production'],['part','Pa
  var f={open:function(o){return !o.closed;},prod:function(o){return /production/i.test(o.status);},part:function(o){return /Partially/.test(o.status);},pro:function(o){return /Proforma/.test(o.status);},done:function(o){return o.closed;},all:function(){return true;}};
  var list=D.orders.filter(f[S.ordTab]).filter(function(o){return match(o.no+' '+o.cust+' '+o.metal+' '+o.usta);}).sort(function(a,b){return b.date.localeCompare(a.date);});
  if(!S.sel||!D.orders.some(function(o){return o.no===S.sel;}))S.sel=list[0]&&list[0].no;
- var h=topBar('Orders','Every order, from proforma to shipped',appLink('Orders',ic('up')+'Upload Excel to order')+'<button class="btn gold" onclick="go(\'basket\')">'+ic('plus')+'New order</button>');
+ var h=topBar('Orders','Every order, from proforma to shipped','<button class="btn ghost" onclick="openImport(\'basketImport\')">'+ic('up')+'Upload Excel to order</button>'+'<button class="btn gold" onclick="go(\'basket\')">'+ic('plus')+'New order</button>');
  h+='<div class="tabs">'+tabs.map(function(t){return '<button class="tab'+(S.ordTab===t[0]?' on':'')+'" onclick="S.ordTab=\''+t[0]+'\';draw()">'+t[1]+' '+D.orders.filter(f[t[0]]).length+'</button>';}).join('')+'</div>';
  h+='<div class="flex"><section class="card" style="flex:3 1 560px;padding:8px 10px;overflow-x:auto"><table><thead><tr><th>Order</th><th>Customer</th><th>Metal</th><th>Progress</th><th>Due</th><th>Status</th></tr></thead><tbody>'+list.map(function(o){var p=o.qty?Math.min(100,Math.round(o.shipped/o.qty*100)):0;return '<tr class="click'+(o.no===S.sel?' sel':'')+'" onclick="S.sel=\''+o.no+'\';draw()"><td style="white-space:nowrap"><b>'+esc(o.no)+'</b><div class="muted">'+dt(o.date)+'</div></td><td>'+esc(o.cust)+'</td><td class="'+(o.metal==='Silver'?'s':'g')+'">'+esc(o.metal)+'</td><td style="min-width:150px"><div class="bar"><i style="width:'+p+'%"></i></div><div class="muted" style="margin-top:4px">'+num(o.shipped)+' / '+num(o.qty)+' pcs</div></td><td>'+dt(o.due)+'</td><td>'+statusChip(o)+'</td></tr>';}).join('')+'</tbody></table>'+(list.length?'':'<p class="muted" style="padding:12px">No orders here.</p>')+'</section>';
  var o=D.orders.find(function(x){return x.no===S.sel;});
@@ -158,7 +158,7 @@ function orders(){var tabs=[['open','Open'],['prod','In production'],['part','Pa
   h+='<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px"><div class="tile"><div class="muted">Ordered</div><b>'+num(o.qty)+' pcs</b></div><div class="tile"><div class="muted">Shipped</div><b>'+num(o.shipped)+' pcs</b></div><div class="tile"><div class="muted">'+(o.metal==='Silver'?'Silver weighed':'Products')+'</div><b>'+(o.metal==='Silver'?gr(o.silverGrams):ls.length)+'</b></div><div class="tile"><div class="muted">Final total</div><b>'+money(o.total,2)+'</b></div></div>';
   h+='<h2 class="h2" style="margin-top:20px">Shipment history</h2>'+hist.map(function(x){return '<div class="row"><div style="flex:1"><b>'+dt(x.date)+'</b><div class="muted">'+esc(x.no)+'</div></div><div style="text-align:right"><b>'+num(x.pcs)+' pcs</b><div class="muted">'+gr(x.grams)+'</div></div></div>';}).join('')+'<div class="row"><div style="flex:1"><b>Now</b><div class="muted">not shipped yet</div></div><div style="text-align:right"><b>'+num(openQ)+' pcs</b><div class="muted">'+gr(openG)+'</div></div></div>';
   h+='<h2 class="h2" style="margin-top:20px">Products · '+ls.length+'</h2>'+ls.slice(0,8).map(function(l){return '<div class="row">'+thumb(l.img,l.metal,l.sku,40)+'<div style="flex:1;min-width:0"><b>'+esc(l.sku||'No SKU')+'</b><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(l.name)+'</div></div><div class="muted" style="text-align:right">'+num(l.shipped)+' / '+num(l.ordered)+'</div></div>';}).join('')+(ls.length>8?'<p class="muted">+ '+(ls.length-8)+' more</p>':'');
-  h+='<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">'+(o.closed?'':'<button class="btn" onclick="openProd(\''+o.no+'\')">Production entry</button>')+appLink('Orders',ic('up')+'Upload Excel')+(o.pdf?'<a class="btn ghost" href="'+esc(o.pdf)+'" target="_blank" rel="noopener">'+ic('doc')+'Order PDF</a>':'')+'<button class="btn ghost" onclick="pdfBtn(this,\'order\',\''+o.no+'\')">'+ic('refresh',16)+'Rebuild usta form</button></div></aside>';}
+  h+='<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">'+(o.closed?'':'<button class="btn" onclick="openProd(\''+o.no+'\')">Production entry</button>')+'<button class="btn ghost" onclick="openOrderEdit(\''+o.no+'\')">Edit order</button>'+(o.pdf?'<a class="btn ghost" href="'+esc(o.pdf)+'" target="_blank" rel="noopener">'+ic('doc')+'Order PDF</a>':'')+'<button class="btn ghost" onclick="pdfBtn(this,\'order\',\''+o.no+'\')">'+ic('refresh',16)+'Rebuild usta form</button></div></aside>';}
  h+='</div>';return h;}
 
 /* ---------- PRODUCTION ---------- */
@@ -198,7 +198,7 @@ function ship(){var list=D.ships.filter(function(s){return match(s.no+' '+s.wayb
 
 /* ---------- FINANCE ---------- */
 function finance(){var f=D.finance, cover=f.owed?Math.round(f.cash/f.owed*100):100;
- var h=topBar('Finance','Net position, supplier balances and every movement',appLink('Suppliers',ic('plus')+'Add activity','gold')+appLink('Suppliers','Add cash'),true);
+ var h=topBar('Finance','Net position, supplier balances and every movement','<button class="btn gold" onclick="openFin(\'Purchase\')">'+ic('plus')+'Add activity</button><button class="btn ghost" onclick="openFin(\'Cash In\')">Add cash</button>',true);
  h+='<section style="background:#14161C;color:#fff;border-radius:22px;padding:28px;display:flex;flex-wrap:wrap;gap:28px;align-items:center"><div style="flex:1 1 260px"><div style="font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:#C9CDD6">Net position</div><div style="font-family:Manrope,sans-serif;font-size:46px;font-weight:800;color:'+(f.net<0?'#FF8A80':'#7EE2A8')+';letter-spacing:-1px">'+money(f.net)+'</div><div style="color:#C9CDD6;font-size:13px">Cash covers '+cover+'% of what we owe</div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;flex:2 1 520px">'+[['Cash on hand',money(f.cash)],['Owed to suppliers',money(f.owed)],['Labor owed',money(f.labor)],['Silver owed',num(f.silver,0)+' g'],['Fine gold owed',num(f.gold,2)+' g'],['Other owed',money(f.other)]].map(function(x,i){return '<div style="background:#1F2330;border-radius:14px;padding:14px"><div style="color:#C9CDD6;font-size:12px">'+x[0]+'</div><b style="font-size:19px'+(i===4?';color:#E2B53E':'')+'">'+x[1]+'</b></div>';}).join('')+'</div></section>';
  var mx=Math.max.apply(null,f.balances.map(function(b){return b.total;}).concat([1]));
  h+='<div class="flex" style="margin-top:16px"><section class="card" style="flex:2 1 520px"><h2 class="h2">Supplier balances</h2>'+f.balances.map(function(b){var parts=[b.labor?'labor '+money(b.labor):'',b.silver?'silver '+num(b.silver,2)+' g':'',b.gold?'gold '+num(b.gold,2)+' g':'',b.other?'other '+money(b.other):''].filter(Boolean).join(' · ');return '<div class="row"><div class="thumb">'+esc(ini(b.name))+'</div><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(b.name)+' <span class="muted">· '+esc(b.type)+'</span></div><div class="muted">'+esc(parts)+'</div><div class="bar" style="margin-top:8px"><i style="width:'+Math.round(b.total/mx*100)+'%"></i></div></div><div style="text-align:right;min-width:120px"><b style="font-family:Manrope,sans-serif;font-size:18px">'+money(b.total)+'</b>'+'<div style="display:flex;gap:10px;justify-content:flex-end;font-size:12px;margin-top:4px">'+(b.pdf?'<a href="'+esc(b.pdf)+'" target="_blank" rel="noopener">Last statement</a>':'')+'<a href="#" onclick="pdfBtn(this,\'mutabakat\',\''+esc(b.name)+'\');return false">New statement</a></div></div></div>';}).join('')+'</section>';
@@ -294,8 +294,8 @@ function openNewOrder(){var gs=bCount('Gold'), ss=bCount('Silver');var def=D.bas
 function otype(){var st=document.querySelector('input[name=o_type]:checked').value==='Stock', c=document.getElementById('o_cust');if(st&&!c.value)c.value='Muscat Israel/Usa';if(!st&&c.value==='Muscat Israel/Usa')c.value='';}
 function saveNewOrder(){var m=(document.querySelector('input[name=o_metal]:checked')||{}).value, t=document.querySelector('input[name=o_type]:checked').value;
  if(!m){toast('Pick a metal');return;}if(t==='Customer Order'&&!fv('o_cust')){toast('Enter the customer or store');document.getElementById('o_cust').focus();return;}
- busyBtn('o_save','Creating… (order PDF takes ~20 s)');
- post({op:'createOrder',metal:m,type:t,customer:fv('o_cust'),due:fv('o_due'),usta:fv('o_usta'),enteredBy:fv('o_by'),notes:fv('o_notes')}).then(function(r){closeModal();toast(r.order+' created with '+r.lines+' product'+(r.lines===1?'':'s'));S.sel=r.order;S.ordTab='all';load();go('orders');})
+ busyBtn('o_save','Creating…');
+ post({op:'createOrder',metal:m,type:t,customer:fv('o_cust'),due:fv('o_due'),usta:fv('o_usta'),enteredBy:fv('o_by'),notes:fv('o_notes')}).then(function(r){closeModal();toast(r.order+' created with '+r.lines+' product'+(r.lines===1?'':'s')+' · usta form PDF follows in about a minute');S.sel=r.order;S.ordTab='all';load();go('orders');})
  .catch(function(e){var b=document.getElementById('o_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent='Create order';}toast('Not saved: '+(e.message||e));});}
 /* PDFs: open a window right away (avoids popup blocking), point it at the PDF when ready */
 function pdfBtn(el,kind,ref){var w=window.open('','_blank');if(w){w.document.write('<p style="font-family:Arial;padding:24px">Building PDF… this can take up to a minute.</p>');}
@@ -312,7 +312,7 @@ function openNewShip(){var wb={};D.ships.forEach(function(s){if(!s.shipped)s.ord
  h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="btn ghost" onclick="closeModal()">Cancel</button>'+(rows.length?'<button class="btn gold" id="ns_save" onclick="saveNewShip()">Create shipment</button>':'')+'</div>';
  modal(h);}
 function saveNewShip(){var orders=[].slice.call(document.querySelectorAll('.ns_o:checked')).map(function(e){return e.value;});if(!orders.length){toast('Pick at least one order');return;}
- busyBtn('ns_save','Creating… (packing list takes ~30 s)');
+ busyBtn('ns_save','Creating…');
  post({op:'shipCreate',orders:orders,date:fv('ns_date'),carrier:fv('ns_carrier'),route:fv('ns_route'),notes:fv('ns_notes')}).then(function(r){closeModal();toast(r.shipNo+' created · '+r.lines+' product lines');load();})
  .catch(function(e){var b=document.getElementById('ns_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent='Create shipment';}toast('Not saved: '+(e.message||e));});}
 function openFinalize(no,edit){var s=D.ships.find(function(x){return x.no===no;});if(!s)return;var f=s.f||{}, v=function(x){return x===''||x==null?'':esc(x);};
@@ -332,17 +332,137 @@ function openFinalize(no,edit){var s=D.ships.find(function(x){return x.no===no;}
   +'<label class="fld">Route<input class="inp" id="fz_route" value="'+v(s.route||'Istanbul to USA')+'"></label>'
   +'<label class="fld">Waybill file<input class="inp" style="padding-top:8px" type="file" id="fz_file" accept="image/*,application/pdf"></label>'
   +'<label class="fld" style="grid-column:1/-1">Notes<input class="inp" id="fz_notes" value="'+v(f.notes)+'"></label></div>';
- if(!edit)h+='<div class="fld" style="margin-top:14px">Close these orders after this shipment<div class="seg">'+ords.map(function(o){var od=D.orders.find(function(x){return x.no===o;})||{};var full=od.qty&&(od.shipped+D.lines.filter(function(l){return l.order===o;}).reduce(function(a,l){return a+l.openQty;},0))>=od.qty&&od.type!=='Stock';return '<label><input type="checkbox" class="fz_close" value="'+esc(o)+'"'+(full?' checked':'')+'>'+esc(o)+'</label>';}).join('')+'</div></div><p class="muted" style="margin-top:10px">Finalizing releases products with 0 pieces, writes the usta debt and rebuilds the packing list. It takes about a minute.</p>';
+ if(!edit)h+='<div class="fld" style="margin-top:14px">Close these orders after this shipment<div class="seg">'+ords.map(function(o){var od=D.orders.find(function(x){return x.no===o;})||{};var full=od.qty&&(od.shipped+D.lines.filter(function(l){return l.order===o;}).reduce(function(a,l){return a+l.openQty;},0))>=od.qty&&od.type!=='Stock';return '<label><input type="checkbox" class="fz_close" value="'+esc(o)+'"'+(full?' checked':'')+'>'+esc(o)+'</label>';}).join('')+'</div></div><p class="muted" style="margin-top:10px">Finalizing releases products with 0 pieces, then the usta debt and the packing list update in the background within a minute.</p>';
  h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn gold" id="fz_save" onclick="saveFinalize(\''+no+'\','+(edit?'true':'false')+')">'+(edit?'Save details':'Finalize shipment')+'</button></div>';
  modal(h);}
 function readFile(el){return new Promise(function(res,rej){var f=el&&el.files&&el.files[0];if(!f)return res(null);if(f.size>8e6)return rej(new Error('File is larger than 8 MB'));var r=new FileReader();r.onload=function(){res({name:f.name,type:f.type,data:String(r.result).split(',')[1]});};r.onerror=function(){rej(new Error('Could not read the file'));};r.readAsDataURL(f);});}
 function saveFinalize(no,edit){if(!edit&&!fv('fz_wb')){toast('Enter the waybill number');document.getElementById('fz_wb').focus();return;}
- busyBtn('fz_save',edit?'Saving…':'Finalizing… about a minute');
+ busyBtn('fz_save',edit?'Saving…':'Finalizing…');
  readFile(document.getElementById('fz_file')).then(function(file){return post({op:edit?'shipUpdate':'shipFinalize',shipNo:no,waybill:fv('fz_wb'),date:fv('fz_date'),carrier:fv('fz_carrier'),packages:fv('fz_pk'),gross:fv('fz_gw'),declared:fv('fz_dv'),freight:fv('fz_fr'),customs:fv('fz_cu'),insurance:fv('fz_in'),other:fv('fz_ot'),route:fv('fz_route'),notes:fv('fz_notes'),file:file,closeOrders:[].slice.call(document.querySelectorAll('.fz_close:checked')).map(function(e){return e.value;})});})
  .then(function(r){closeModal();toast(no+(edit?' updated':' finalized')+(r.released?' · '+r.released+' empty lines released':''));load();})
  .catch(function(e){var b=document.getElementById('fz_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent=edit?'Save details':'Finalize shipment';}toast('Not saved: '+(e.message||e));});}
 function cancelShip(no){if(!confirm('Remove draft '+no+'? Its products go back to "produced, not shipped". Nothing else is deleted.'))return;
  post({op:'shipCancel',shipNo:no}).then(function(){toast(no+' removed');load();}).catch(function(e){toast('Not removed: '+(e.message||e));});}
+/* ---------- products: add / edit / duplicate ---------- */
+function openProduct(metal,id,mode){var p=metal?D.products.find(function(x){return x.metal===metal&&x.id===id;})||{}:{}, edit=mode==='edit', m=p.metal||'Gold', v=function(x){return x===''||x==null?'':esc(x);};
+ var h=mhead(edit?'Edit '+esc(p.sku):(mode==='dup'?'Duplicate '+esc(p.sku):'Add product'),edit?'Changes apply to the catalog':'New product in the '+(mode==='dup'?m.toLowerCase()+' ':'')+'catalog');
+ h+='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">'
+  +'<div class="fld">Metal<div class="seg"><label><input type="radio" name="pr_m" value="Gold"'+(m==='Gold'?' checked':'')+(edit?' disabled':'')+' onchange="prMetal()">Gold</label><label><input type="radio" name="pr_m" value="Silver"'+(m==='Silver'?' checked':'')+(edit?' disabled':'')+' onchange="prMetal()">Silver</label></div></div>'
+  +'<label class="fld">SKU *<input class="inp" id="pr_sku" value="'+(mode==='dup'?'':v(p.sku))+'" placeholder="'+(mode==='dup'?v(p.sku)+'-2':'e.g. D230')+'"></label>'
+  +'<label class="fld">Description<input class="inp" id="pr_desc" value="'+v(p.name)+'"></label>'
+  +'<label class="fld">Category<input class="inp" id="pr_cat" value="'+v(p.cat)+'" list="dl_cat"></label>'
+  +'<label class="fld">Motif<input class="inp" id="pr_motif" value="'+v(p.motif)+'"></label>'
+  +'<label class="fld">Stone / color<input class="inp" id="pr_st" value="'+v(p.stones)+'"></label>'
+  +'<label class="fld">Size<input class="inp" id="pr_size" value="'+v(p.size)+'"></label>'
+  +'<label class="fld">Style<input class="inp" id="pr_style" value="'+v(p.style)+'"></label>'
+  +'<label class="fld">Metal color<input class="inp" id="pr_mc" value="'+v(p.color)+'"></label>'
+  +'<label class="fld">Gram / pc<input class="inp" type="number" min="0" step="0.01" id="pr_g" value="'+v(p.gram)+'"></label>'
+  +'<label class="fld"><span id="pr_lab_l">Labor</span><input class="inp" type="number" min="0" step="0.01" id="pr_lab" value="'+v(p.labor)+'"></label>'
+  +'<label class="fld gold-only">Stone $ / pc<input class="inp" type="number" min="0" step="0.01" id="pr_sp" value="'+v(p.stonePc)+'"></label>'
+  +'<label class="fld gold-only">Setting $ / pc<input class="inp" type="number" min="0" step="0.01" id="pr_setp" value="'+v(p.settingPc)+'"></label>'
+  +'<label class="fld gold-only" style="grid-column:span 2">Notes<input class="inp" id="pr_notes" value="'+v(p.notes)+'"></label>'
+  +'<label class="fld" style="grid-column:1/-1">Image URL<input class="inp" id="pr_img" value="'+v(p.img)+'" placeholder="https://…"></label>'
+  +'<label class="fld" style="grid-column:1/-1">or upload a photo<input class="inp" style="padding-top:8px" type="file" id="pr_photo" accept="image/*"></label></div>'
+  +'<datalist id="dl_cat">'+Array.from(new Set(D.products.map(function(x){return x.cat;}).filter(Boolean))).sort().map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>';
+ h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn gold" id="pr_save" onclick="saveProduct(\''+(edit?esc(p.sku):'')+'\')">'+(edit?'Save changes':'Add product')+'</button></div>';
+ modal(h);prMetal();}
+function prMetal(){var s=(document.querySelector('input[name=pr_m]:checked')||{}).value==='Silver';[].forEach.call(document.querySelectorAll('.gold-only'),function(e){e.style.display=s?'none':'';});var l=document.getElementById('pr_lab_l');if(l)l.textContent=s?'Labor $ / g':'Labor (milyem)';}
+function saveProduct(key){var m=(document.querySelector('input[name=pr_m]:checked')||{}).value;if(!fv('pr_sku')){toast('Enter a SKU');document.getElementById('pr_sku').focus();return;}
+ busyBtn('pr_save','Saving…');
+ readFile(document.getElementById('pr_photo')).then(function(photo){return post({op:'productSave',metal:m,mode:key?'edit':'add',key:key,photo:photo,fields:{sku:fv('pr_sku'),description:fv('pr_desc'),category:fv('pr_cat'),motif:fv('pr_motif'),stones:fv('pr_st'),size:fv('pr_size'),style:fv('pr_style'),metalColor:fv('pr_mc'),gram:fv('pr_g'),labor:fv('pr_lab'),stonePc:fv('pr_sp'),settingPc:fv('pr_setp'),notes:fv('pr_notes'),imageUrl:fv('pr_img')}});})
+ .then(function(r){closeModal();toast(r.sku+(key?' saved':' added to the '+r.metal.toLowerCase()+' catalog'));load();})
+ .catch(function(e){var b=document.getElementById('pr_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent=key?'Save changes':'Add product';}toast('Not saved: '+(e.message||e));});}
+
+/* ---------- Excel / Google Sheet uploads ---------- */
+function openImport(op){var prod=op==='productImport';
+ var h=mhead(prod?'Import products from Excel':'Upload Excel to order',prod?'Uses the Muscat product template (SKU column required)':'Lines go into the basket; matched SKUs are added, the rest wait for a SKU there');
+ h+='<div style="display:grid;gap:14px"><label class="fld">Excel file (.xlsx)<input class="inp" style="padding-top:8px" type="file" id="im_file" accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"></label><label class="fld">or Google Sheets link<input class="inp" id="im_link" placeholder="https://docs.google.com/spreadsheets/d/…"></label></div><div id="im_res" class="muted" style="margin-top:12px;white-space:pre-wrap"></div>';
+ h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="btn ghost" onclick="closeModal()">Close</button><button class="btn gold" id="im_save" onclick="runImport(\''+op+'\')">Upload</button></div>';
+ modal(h);}
+function runImport(op){var el=document.getElementById('im_file');if(!(el.files&&el.files[0])&&!fv('im_link')){toast('Choose a file or paste a link');return;}
+ busyBtn('im_save','Uploading…');
+ readFile(el).then(function(file){return post({op:op,file:file,link:fv('im_link')});}).then(function(r){var b=document.getElementById('im_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent='Upload';}
+  var msg=op==='productImport'?(r.added+' product'+(r.added===1?'':'s')+' added'+(r.errors?'\n'+r.errors:'')):(r.added+' line'+(r.added===1?'':'s')+' added to the basket'+(r.unmatched?'\nNeeds a SKU: '+r.unmatched:''));
+  var e=document.getElementById('im_res');if(e)e.textContent=msg;toast(msg.split('\n')[0]);load();})
+ .catch(function(e){var b=document.getElementById('im_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent='Upload';}toast('Upload failed: '+(e.message||e));});}
+
+/* ---------- order editing ---------- */
+function openOrderEdit(no){var o=D.orders.find(function(x){return x.no===no;});if(!o)return;var ls=D.lines.filter(function(l){return l.order===no;}), v=function(x){return x===''||x==null?'':esc(x);};
+ var h=mhead('Edit '+esc(no),esc([o.metal,o.type,o.status].join(' · ')));
+ h+='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">'
+  +'<label class="fld">Customer / Store<input class="inp" id="oe_cust" value="'+v(o.cust)+'"></label>'
+  +'<label class="fld">Due date<input class="inp" type="date" id="oe_due" value="'+v(o.due)+'"></label>'
+  +'<label class="fld">Order type<select class="inp" id="oe_type"><option'+(o.type==='Customer Order'?' selected':'')+'>Customer Order</option><option'+(o.type==='Stock'?' selected':'')+'>Stock</option></select></label>'
+  +'<label class="fld">Usta<select class="inp" id="oe_usta"><option value="">—</option>'+(D.ustas||[]).map(function(u){return '<option'+(u.name===o.usta?' selected':'')+'>'+esc(u.name)+'</option>';}).join('')+'</select></label>'
+  +'<label class="fld">Entered by<select class="inp" id="oe_by"><option'+(o.enteredBy!=='Muscat USA/Israel'?' selected':'')+'>Muscat Istanbul</option><option'+(o.enteredBy==='Muscat USA/Israel'?' selected':'')+'>Muscat USA/Israel</option></select></label>'
+  +'<label class="fld">Notes<input class="inp" id="oe_notes" value="'+v(o.notes)+'"></label></div>';
+ h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap"><button class="btn ghost" id="oe_close" onclick="closeOrder(\''+no+'\','+(o.closed?'false':'true')+')">'+(o.closed?'Reopen order':'Close order')+'</button><button class="btn gold" id="oe_save" onclick="saveOrderEdit(\''+no+'\')">Save order</button></div>';
+ h+='<h2 class="h2" style="margin-top:22px">Products · '+ls.length+'</h2><div style="border:1px solid #EEF0F4;border-radius:14px;max-height:40vh;overflow:auto">'+ls.map(function(l){return '<div class="row" style="padding:10px 12px;gap:10px;flex-wrap:wrap">'+thumb(l.img,l.metal,l.sku,36)+'<div style="flex:1 1 160px;min-width:0"><b>'+esc(l.sku||'No SKU')+'</b><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(l.name)+'</div></div>'
+  +'<input class="inp sm" style="width:70px" type="number" min="1" aria-label="Qty" id="le_q_'+l.id+'" value="'+l.ordered+'"><input class="inp" style="width:110px" placeholder="Color" id="le_c_'+l.id+'" value="'+v(l.goldColor!=null?l.goldColor:l.color)+'"><input class="inp" style="width:90px" placeholder="Size" id="le_s_'+l.id+'" value="'+v(l.size)+'"><input class="inp" style="width:170px" placeholder="Notes" id="le_n_'+l.id+'" value="'+v(l.notes)+'">'
+  +'<button class="btn ghost sm" onclick="saveLine(\''+l.id+'\',\''+no+'\')">Save</button>'+(l.shipped?'':'<button class="btn ghost sm" style="color:#9B1C1C" onclick="deleteLine(\''+l.id+'\',\''+no+'\')">Remove</button>')+'</div>';}).join('')+'</div>';
+ var prods=D.products.filter(function(p){return o.metal==='Silver'?p.metal==='Silver':p.metal==='Gold';});
+ h+='<h2 class="h2" style="margin-top:18px">Add a product</h2><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end"><label class="fld" style="flex:1 1 200px">SKU<input class="inp" id="la_sku" list="dl_sku" placeholder="Type to search"></label><label class="fld">Qty<input class="inp sm" style="width:80px" type="number" min="1" id="la_q" value="1"></label><label class="fld">Color<input class="inp" style="width:120px" id="la_c"></label><label class="fld">Size<input class="inp" style="width:90px" id="la_s"></label><label class="fld" style="flex:1 1 160px">Notes<input class="inp" id="la_n"></label><button class="btn" id="la_save" onclick="addLine(\''+no+'\',\''+o.metal+'\')">Add</button></div><datalist id="dl_sku">'+prods.map(function(p){return '<option value="'+esc(p.sku)+'">'+esc(p.name)+'</option>';}).join('')+'</datalist>';
+ modal(h);}
+function saveOrderEdit(no){busyBtn('oe_save','Saving…');post({op:'orderUpdate',order:no,fields:{customer:fv('oe_cust'),due:fv('oe_due'),type:fv('oe_type'),usta:fv('oe_usta'),enteredBy:fv('oe_by'),notes:fv('oe_notes')}})
+ .then(function(){closeModal();toast(no+' saved · usta form PDF updates in the background');load();}).catch(function(e){var b=document.getElementById('oe_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent='Save order';}toast('Not saved: '+(e.message||e));});}
+function closeOrder(no,close){if(!confirm((close?'Close ':'Reopen ')+no+'?'))return;busyBtn('oe_close','Saving…');post({op:'orderUpdate',order:no,close:close}).then(function(){closeModal();toast(no+(close?' closed':' reopened'));load();}).catch(function(e){toast('Not saved: '+(e.message||e));});}
+function saveLine(id,no){post({op:'lineSave',lineId:id,qty:fv('le_q_'+id),color:fv('le_c_'+id),size:fv('le_s_'+id),notes:fv('le_n_'+id)}).then(function(){toast('Product saved');load();}).catch(function(e){toast('Not saved: '+(e.message||e));});}
+function deleteLine(id,no){var l=D.lines.find(function(x){return x.id===id;})||{};if(!confirm('Remove '+(l.sku||'this product')+' from '+no+'?'))return;
+ post({op:'lineDelete',lineId:id}).then(function(){toast((l.sku||'Product')+' removed');D.lines=D.lines.filter(function(x){return x.id!==id;});openOrderEdit(no);load();}).catch(function(e){toast('Not removed: '+(e.message||e));});}
+function addLine(no,metal){var sku=fv('la_sku').toUpperCase(), p=D.products.find(function(x){return x.metal===(metal==='Silver'?'Silver':'Gold')&&x.sku.toUpperCase()===sku;});
+ if(!p){toast('Pick a '+(metal==='Silver'?'silver':'gold')+' SKU from the list');return;}busyBtn('la_save','Adding…');
+ post({op:'lineSave',order:no,metal:p.metal,ref:p.id,qty:fv('la_q')||1,color:fv('la_c'),size:fv('la_s'),notes:fv('la_n')}).then(function(){closeModal();toast(p.sku+' added to '+no+' · usta form PDF updates in the background');load();})
+ .catch(function(e){var b=document.getElementById('la_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent='Add';}toast('Not saved: '+(e.message||e));});}
+
+/* ---------- finance entries ---------- */
+function openFin(type){var d=new Date().toISOString().slice(0,10);
+ var h=mhead(type==='Cash In'?'Add cash':'Add supplier activity','Writes to Usta Hareketleri; balances update in the background');
+ h+='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">'
+  +'<label class="fld">Type<select class="inp" id="fn_t" onchange="finShow()">'+['Purchase','Payment','Cash In','Opening Balance','Adjustment'].map(function(x){return '<option'+(x===type?' selected':'')+'>'+x+'</option>';}).join('')+'</select></label>'
+  +'<label class="fld">Date<input class="inp" type="date" id="fn_d" value="'+d+'"></label>'
+  +'<label class="fld fn-u">Supplier<select class="inp" id="fn_u" onchange="finCalc()"><option value="">—</option>'+(D.ustas||[]).map(function(u){return '<option>'+esc(u.name)+'</option>';}).join('')+'</select></label>'
+  +'<label class="fld" style="grid-column:1/-1">Description<input class="inp" id="fn_a"></label>'
+  +'<label class="fld fn-pay">Payment method<select class="inp" id="fn_pm" onchange="finShow()"><option value="">—</option>'+['Labor in $','Silver in $','Fine gold in $','Silver (grams)','Fine gold (grams)','Other in $'].map(function(x){return '<option>'+x+'</option>';}).join('')+'</select></label>'
+  +'<label class="fld fn-amt">Pay amount $<input class="inp" type="number" step="0.01" id="fn_pa" oninput="finCalc()"></label>'
+  +'<label class="fld fn-split" style="justify-content:flex-end"><span class="seg"><label><input type="checkbox" id="fn_sp" onchange="finCalc()">Split in half (labor + silver)</label></span></label>'
+  +'<label class="fld fn-gp">Gram price used $<input class="inp" type="number" step="0.001" id="fn_gp" oninput="finCalc()"></label>'
+  +'<label class="fld fn-g">Silver product grams<input class="inp" type="number" step="0.01" id="fn_ug" oninput="finCalc()"></label>'
+  +'<label class="fld fn-ag">Gold product grams<input class="inp" type="number" step="0.01" id="fn_ag" oninput="finCalc()"></label>'
+  +'<label class="fld fn-lab">Labor $<input class="inp" type="number" step="0.01" id="fn_l"></label>'
+  +'<label class="fld fn-sg">Silver g<input class="inp" type="number" step="0.01" id="fn_s"></label>'
+  +'<label class="fld fn-has">Fine gold g<input class="inp" type="number" step="0.001" id="fn_h"></label>'
+  +'<label class="fld fn-oth"><span id="fn_o_l">Other $</span><input class="inp" type="number" step="0.01" id="fn_o"></label>'
+  +'<label class="fld fn-pesin" style="justify-content:flex-end"><span class="seg"><label><input type="checkbox" id="fn_p">Paid now (cash)</label></span></label>'
+  +'<label class="fld" style="grid-column:span 2">Note<input class="inp" id="fn_n"></label>'
+  +'<label class="fld">Photo<input class="inp" style="padding-top:8px" type="file" id="fn_ph" accept="image/*,application/pdf"></label></div>'
+  +'<p class="muted" style="margin-top:10px">Grams and labor fill in from the supplier rates; you can change them before saving.</p>';
+ h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn gold" id="fn_save" onclick="saveFin()">Save</button></div>';
+ modal(h);finShow();}
+function finShow(){var t=fv('fn_t'), pm=fv('fn_pm'), show=function(cls,on){[].forEach.call(document.querySelectorAll('.'+cls),function(e){e.style.display=on?'':'none';});};
+ var cash=t==='Cash In', pay=t==='Payment', pur=t==='Purchase', free=!cash&&!pay&&!pur;
+ show('fn-u',!cash);show('fn-pay',pay);show('fn-amt',pay&&/in \$/.test(pm));show('fn-gp',pay&&(pm==='Silver in $'||pm==='Fine gold in $'));show('fn-split',pay&&pm==='Silver in $');
+ show('fn-g',pur||free||(pay&&pm==='Silver (grams)'));show('fn-ag',pur||free||(pay&&(pm==='Fine gold (grams)'||pm==='Fine gold in $')));
+ show('fn-lab',pur||free||(pay&&(pm==='Labor in $'||pm==='Silver in $')));show('fn-sg',pur||free||(pay&&/Silver/.test(pm)));show('fn-has',pur||free||(pay&&/Fine gold/.test(pm)));
+ show('fn-oth',cash||pur||free||(pay&&(pm==='Other in $'||!pm)));show('fn-pesin',pur);
+ var ol=document.getElementById('fn_o_l');if(ol)ol.textContent=cash?'Amount $':'Other $';
+ var gp=document.getElementById('fn_gp');if(gp&&!gp.value){if(pm==='Silver in $')gp.value=D.finance.silverPrice||D.prices.silver;if(pm==='Fine gold in $')gp.value=D.finance.goldPrice||'';}
+ finCalc();}
+function finCalc(){var t=fv('fn_t'), pm=fv('fn_pm'), u=(D.ustas||[]).find(function(x){return x.name===fv('fn_u');})||{}, r2=function(x){return Math.round(x*100)/100;}, set=function(id,val){var e=document.getElementById(id);if(e)e.value=(val===''||isNaN(val))?'':val;};
+ var ug=Number(fv('fn_ug')||0), ag=Number(fv('fn_ag')||0), pa=Number(fv('fn_pa')||0), gp=Number(fv('fn_gp')||0), gk=u.gK||(u.name==='Erhan'?0.95:0.925), gl=u.gLab||0, hk=u.name==='Halil'?0.735:0.685;
+ if(t==='Purchase'){set('fn_l',ug?r2(ug*gl):'');set('fn_s',ug?r2(ug*gk):'');set('fn_h',ag?Math.round(ag*hk*1000)/1000:'');}
+ if(t==='Payment'){
+  if(pm==='Labor in $')set('fn_l',pa||'');
+  if(pm==='Other in $')set('fn_o',pa||'');
+  if(pm==='Silver in $'){var sp=document.getElementById('fn_sp').checked;set('fn_l',pa&&sp?r2(pa/2):'');set('fn_s',pa&&gp?r2((sp?pa/2:pa)/gp):'');}
+  if(pm==='Fine gold in $'){var has=pa&&gp?pa/gp:0;set('fn_h',has?Math.round(has*1000)/1000:'');set('fn_ag',has?r2(has/hk):'');}
+  if(pm==='Silver (grams)')set('fn_s',ug?r2(ug*gk):'');
+  if(pm==='Fine gold (grams)')set('fn_h',ag?Math.round(ag*hk*1000)/1000:'');}}
+function saveFin(){var t=fv('fn_t');if(t!=='Cash In'&&!fv('fn_u')){toast('Choose the supplier');return;}if(t==='Payment'&&!fv('fn_pm')){toast('Choose the payment method');return;}
+ var vis=function(id){var e=document.getElementById(id);return e&&e.closest('label').style.display!=='none'?fv(id):'';};
+ busyBtn('fn_save','Saving…');
+ readFile(document.getElementById('fn_ph')).then(function(photo){return post({op:'finAdd',photo:photo,fields:{islem:t,tarih:fv('fn_d'),usta:t==='Cash In'?'':fv('fn_u'),aciklama:fv('fn_a'),method:t==='Payment'?fv('fn_pm'):'',payAmount:vis('fn_pa'),gramPrice:vis('fn_gp'),urunGram:vis('fn_ug'),altinUrunGram:vis('fn_ag'),iscilik:vis('fn_l'),gumus:vis('fn_s'),has:vis('fn_h'),diger:vis('fn_o'),pesin:t==='Purchase'&&document.getElementById('fn_p').checked,not:fv('fn_n')}});})
+ .then(function(r){closeModal();toast(t+' saved'+(r.rows>1?' with payment':'')+' · balances refresh in about a minute');load();})
+ .catch(function(e){var b=document.getElementById('fn_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent='Save';}toast('Not saved: '+(e.message||e));});}
 nav();load();
 </script>
 </body>
