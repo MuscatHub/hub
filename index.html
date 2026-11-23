@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Muscat Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,sans-serif;color:#14161C;background:#F3F4F7}
+a{color:#7A5A06}a:hover{color:#5C4304}
+button{font-family:inherit}
+.shell{display:flex;min-height:100vh}
+.side{width:236px;flex:none;background:#14161C;color:#C9CDD6;padding:28px 16px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.brand{font-family:Manrope,sans-serif;font-weight:800;font-size:20px;color:#fff;padding:0 12px 24px}
+.brand span{color:#E2B53E}
+.nl{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:10px;color:#C9CDD6;text-decoration:none;font-size:14px;font-weight:500;min-height:44px;border:0;background:none;cursor:pointer;width:100%;text-align:left}
+.nl:hover{background:#1F2330;color:#fff}
+.nl.on{background:#262B3A;color:#fff}
+.nl.on svg{color:#E2B53E}
+.badge{margin-left:auto;background:#E2B53E;color:#14161C;font-size:11px;font-weight:700;border-radius:20px;padding:2px 8px}
+.price{margin-top:auto;padding:16px 12px 0;border-top:1px solid #262B3A;font-size:12px;color:#9AA0AE;display:flex;flex-direction:column;gap:6px}
+.price b{color:#fff;font-weight:600}
+.main{flex:1;min-width:0;padding:32px 40px 56px}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:24px}
+.top h1{font-family:Manrope,sans-serif;font-size:30px;margin:0;font-weight:800;letter-spacing:-.4px}
+.sub{color:#5E6472;font-size:14px;margin-top:4px}
+.search{margin-left:auto;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E1E3EA;border-radius:12px;padding:0 14px;height:44px;min-width:260px;color:#5E6472}
+.search input{border:0;outline:0;font:inherit;font-size:14px;flex:1;background:transparent;min-width:0}
+.btn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:12px;border:0;background:#14161C;color:#fff;font:600 14px Inter,sans-serif;cursor:pointer;text-decoration:none;white-space:nowrap}
+.btn:hover{color:#fff;opacity:.92}
+.btn.gold{background:#E2B53E;color:#14161C}.btn.gold:hover{color:#14161C}
+.btn.ghost{background:#fff;color:#14161C;border:1px solid #E1E3EA}.btn.ghost:hover{color:#14161C;background:#F6F7FA}
+.btn.sm{height:36px;padding:0 12px;font-size:13px}
+.card{background:#fff;border-radius:18px;border:1px solid #E7E9EF;padding:22px}
+.k{font-size:12px;color:#5E6472;text-transform:uppercase;letter-spacing:.6px;font-weight:600}
+.v{font-family:Manrope,sans-serif;font-size:28px;font-weight:800;margin-top:8px;letter-spacing:-.3px}
+.chip{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.c-prod{background:#FFF3D6;color:#7A5300}.c-ship{background:#E3F2E8;color:#1E6B3A}.c-part{background:#EAE6FB;color:#4B3A9C}.c-pro{background:#E8ECF3;color:#3C4658}.c-open{background:#E2EEFB;color:#1D4F86}.c-red{background:#FDE7E7;color:#9B1C1C}
+.g{color:#8A6508}.s{color:#4A5A72}
+.row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid #EEF0F4}
+.row:last-child{border-bottom:0}
+.muted{color:#5E6472;font-size:13px}
+.h2{font-family:Manrope,sans-serif;font-size:17px;font-weight:800;margin:0 0 6px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.tab{height:36px;padding:0 14px;border-radius:20px;border:1px solid #E1E3EA;background:#fff;font:500 13px Inter,sans-serif;color:#3C4250;cursor:pointer}
+.tab.on{background:#14161C;color:#fff;border-color:#14161C}
+.thumb{width:48px;height:48px;border-radius:12px;background:#F1EDE2;display:flex;align-items:center;justify-content:center;color:#8A6508;flex:none;font-weight:700;font-size:13px;overflow:hidden}
+.thumb.sv{background:#ECEFF4;color:#4A5A72}
+.thumb img{width:100%;height:100%;object-fit:cover}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:12px;color:#5E6472;font-weight:600;text-transform:uppercase;letter-spacing:.5px;padding:10px 12px;border-bottom:1px solid #E7E9EF}
+td{padding:13px 12px;border-bottom:1px solid #EEF0F4;vertical-align:middle}
+tr.sel td{background:#FBF6E7}
+tr.click{cursor:pointer}tr.click:hover td{background:#F8F9FB}
+.bar{height:8px;border-radius:8px;background:#EEF0F4;overflow:hidden}
+.bar i{display:block;height:100%;background:#E2B53E;border-radius:8px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.flex{display:flex;flex-wrap:wrap;gap:16px}
+.tile{background:#F6F7FA;border-radius:12px;padding:12px}
+.step{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none}
+.loading{display:flex;align-items:center;justify-content:center;height:60vh;color:#5E6472;gap:12px}
+.spin{width:22px;height:22px;border:3px solid #E1E3EA;border-top-color:#E2B53E;border-radius:50%;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.prod-img{height:170px;background:#F6F0E1;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.prod-img img{width:100%;height:100%;object-fit:cover}
+.note{background:#FFF8E6;border:1px solid #F3E2B0;color:#5C4304;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:16px}
+@media (max-width:900px){.shell{flex-direction:column}.side{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;padding:12px}.brand{padding:8px 12px;width:100%}.price{display:none}.nl{width:auto}.main{padding:20px 16px}.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.search{margin-left:0;min-width:0;width:100%}}
+</style>
+</head>
+<body>
+<div class="shell">
+<nav class="side" aria-label="Main" id="nav"></nav>
+<main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
+</div>
+<script>
+var D=null, S={page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
+var ICON={home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',gem:'<path d="M6 3h12l3 6-9 12L3 9z"/><path d="M3 9h18"/>',bag:'<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',list:'<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',tool:'<path d="M14 4l6 6-3 3-6-6z"/><path d="M11 7L4 14l6 6 7-7"/>',plane:'<path d="M2 12l20-8-6 18-4-7z"/><path d="M12 15l4-4"/>',cash:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',plus:'<path d="M12 5v14M5 12h14"/>',up:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/>',doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/>',refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'};
+var STAGES=[{n:'Ordered',d:'M8 4h8v3H8zM6 6h12v15H6zM9 12h6M9 16h4'},{n:'Wax',d:'M12 3c3 4 5 6 5 10a5 5 0 0 1-10 0c0-4 2-6 5-10z'},{n:'Casting',d:'M12 2c2 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-5 3-6 0 3 1 4 3 4 0-3-1-6 0-9z'},{n:'Setting',d:'M6 3h12l3 6-9 12L3 9zM3 9h18'},{n:'Polish & Laser',d:'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z'},{n:'Ready',d:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12l3 3 5-6'}];
+var NAV=[['home','Home','home'],['products','Products','gem'],['basket','Basket','bag'],['orders','Orders','list'],['prod','Production','tool'],['ship','Shipments','plane'],['finance','Finance','cash']];
+function ic(n,s){return '<svg width="'+(s||18)+'" height="'+(s||18)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[n]+'</svg>';}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function money(n,d){n=Number(n)||0;return (n<0?'−':'')+'$'+Math.abs(n).toLocaleString('en-US',{minimumFractionDigits:d||0,maximumFractionDigits:d||0});}
+function num(n,d){return (Number(n)||0).toLocaleString('en-US',{minimumFractionDigits:d||0,maximumFractionDigits:d||0});}
+function gr(n){return num(n,2)+' g';}
+function dt(s){if(!s)return '—';var p=String(s).split('-');if(p.length<3)return esc(s);var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return (+p[2])+' '+m[+p[1]-1]+' '+p[0];}
+function ini(s){s=String(s||'?').replace(/[^A-Za-z0-9 ]/g,' ').trim().split(/\s+/);return ((s[0]||'?')[0]+((s[1]||'')[0]||(s[0]||'')[1]||'')).toUpperCase();}
+function thumb(img,metal,label,size){var st=size?'width:'+size+'px;height:'+size+'px':'';return '<div class="thumb'+(metal==='Silver'?' sv':'')+'" style="'+st+'">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy">':esc(ini(label)))+'</div>';}
+function statusChip(o){var s=o.status||'';var c=/Partially/.test(s)?'c-part':/open\)/.test(s)?'c-open':/Shipped/.test(s)?'c-ship':/Proforma/.test(s)?'c-pro':'c-prod';return '<span class="chip '+c+'">'+esc(s)+'</span>';}
+function appLink(view,label,cls){return '<a class="btn '+(cls||'ghost')+'" href="'+esc(D.appUrl+'&view='+encodeURIComponent(view))+'" target="_blank" rel="noopener">'+label+'</a>';}
+function topBar(t,sub,extra,noSearch){return '<div class="top"><div><h1>'+t+'</h1><div class="sub">'+sub+'</div></div>'+(noSearch?'<span style="margin-left:auto"></span>':'<label class="search">'+ic('search')+'<input id="q" aria-label="Search" placeholder="Search orders, SKUs, customers" value="'+esc(S.q)+'" oninput="S.q=this.value;draw(true)"></label>')+(extra||'')+'<button class="btn ghost" onclick="load()" aria-label="Refresh data">'+ic('refresh')+'</button></div>';}
+function go(p){S.page=p;S.q='';draw();window.scrollTo(0,0);}
+function nav(){var n='<div class="brand">Muscat <span>Hub</span></div>';NAV.forEach(function(x){n+='<button class="nl'+(S.page===x[0]?' on':'')+'" onclick="go(\''+x[0]+'\')">'+ic(x[2])+x[1]+(x[0]==='basket'&&D&&D.basket.length?'<span class="badge">'+D.basket.length+'</span>':'')+'</button>';});
+ if(D)n+='<div class="price"><div>Live gold 24K <b>'+money(D.prices.gold,2)+'/g</b></div><div>Live silver 999 <b>'+money(D.prices.silver,3)+'/g</b></div><div>Updated '+esc(D.at.slice(11))+'</div></div>';document.getElementById('nav').innerHTML=n;}
+function match(t){var q=S.q.trim().toLowerCase();return !q||String(t).toLowerCase().indexOf(q)>=0;}
+function openOrders(){return D.orders.filter(function(o){return !o.closed;});}
+function stageOf(l){return l.stage>=1&&l.stage<=6?l.stage:0;}
+
+/* ---------- HOME ---------- */
+function home(){var oo=openOrders(), inprod=oo.filter(function(o){return /production/i.test(o.status);}).length;
+ var month=D.at.slice(0,7), sm=D.ships.filter(function(s){return s.shipped&&String(s.date).slice(0,7)===month;});
+ var pcsM=sm.reduce(function(a,s){return a+s.pcs;},0);
+ var openLines=D.lines.filter(function(l){var o=D.orders.find(function(x){return x.no===l.order;});return o&&!o.closed&&l.shipped<l.ordered;});
+ var counts=[0,0,0,0,0,0,0];openLines.forEach(function(l){counts[stageOf(l)]+=Math.max(0,l.ordered-l.shipped);});var mx=Math.max.apply(null,counts.slice(1).concat([1]));
+ var h=topBar('Muscat Hub','Live data · '+esc(dt(D.at.slice(0,10)))+' · '+oo.length+' open orders','<button class="btn gold" onclick="go(\'basket\')">'+ic('plus')+'New order</button>',true);
+ h+='<div class="grid4">'+[['Open orders',oo.length,inprod+' in production'],['Shipped this month',num(pcsM)+' pcs',sm.length+' shipment'+(sm.length===1?'':'s')],['Cash on hand',money(D.finance.cash),'after all app moves'],['Owed to suppliers',money(D.finance.owed),D.finance.balances.length+' suppliers open']].map(function(k){return '<div class="card"><div class="k">'+k[0]+'</div><div class="v">'+k[1]+'</div><div class="muted" style="margin-top:6px">'+k[2]+'</div></div>';}).join('')+'</div>';
+ var qa=[['New order','basket',1],['Add products','products'],['Production','prod'],['Shipments','ship'],['Add activity','finance'],['Add cash','finance']];
+ h+='<section class="card" style="margin-top:16px"><h2 class="h2">Quick actions</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:12px">'+qa.map(function(q){return '<button onclick="go(\''+q[1]+'\')" style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:14px;background:#F6F7FA;border:0;cursor:pointer;text-align:left;min-height:92px"><span style="width:36px;height:36px;border-radius:10px;background:'+(q[2]?'#E2B53E':'#14161C')+';color:'+(q[2]?'#14161C':'#E2B53E')+';display:flex;align-items:center;justify-content:center">'+ic('plus')+'</span><span style="font-weight:600;font-size:14px;color:#14161C">'+q[0]+'</span></button>';}).join('')+'</div></section>';
+ h+='<div class="flex" style="margin-top:16px"><section class="card" style="flex:2 1 520px"><div style="display:flex;align-items:center"><h2 class="h2">Production flow</h2><a href="#" onclick="go(\'prod\');return false" style="margin-left:auto;font-size:13px">Open production</a></div><div class="muted">Pieces still to ship, by stage</div>';
+ h+='<div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:16px">'+STAGES.map(function(s,i){var n=counts[i+1];return '<div class="tile"><div class="muted">'+s.n+'</div><div class="v" style="font-size:22px">'+num(n)+'</div><div class="bar" style="margin-top:10px"><i style="width:'+Math.round(n/mx*100)+'%"></i></div></div>';}).join('')+'</div>';
+ var due=oo.filter(function(o){return o.due;}).sort(function(a,b){return a.due.localeCompare(b.due);}).slice(0,5);
+ h+='<h2 class="h2" style="margin-top:26px">Due soon</h2>'+due.map(function(o){return '<div class="row" style="cursor:pointer" onclick="S.sel=\''+o.no+'\';go(\'orders\')"><div class="thumb'+(o.metal==='Silver'?' sv':'')+'">'+esc(ini(o.cust))+'</div><div style="flex:1;min-width:0"><div style="font-weight:600">'+esc(o.no)+' · '+esc(o.cust)+'</div><div class="muted">'+num(o.shipped)+' / '+num(o.qty)+' pcs shipped · '+esc(o.metal)+(o.usta?' · '+esc(o.usta):'')+'</div></div><span class="chip c-prod">Due '+dt(o.due)+'</span></div>';}).join('')+'</section>';
+ h+='<section class="card" style="flex:1 1 320px"><h2 class="h2">Recent activity</h2>'+D.finance.moves.slice(0,7).map(moveRow).join('')+'</section></div>';
+ return h;}
+function moveRow(m){var amt=m.paid?money(m.paid,2):(m.labor+m.other)?money(m.labor+m.other,2):m.silver?gr(m.silver)+' silver':m.gold?gr(m.gold)+' gold':'—';
+ return '<div class="row"><div style="flex:1;min-width:0"><div style="font-weight:600">'+esc(m.usta)+' <span class="muted">· '+esc(m.kind)+'</span></div><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+dt(m.date)+' · '+esc(m.desc)+'</div></div><div style="font-weight:700;font-family:Manrope,sans-serif;white-space:nowrap">'+amt+'</div></div>';}
+
+/* ---------- PRODUCTS ---------- */
+function products(){var list=D.products.filter(function(p){return (S.catTab==='all'||p.metal===S.catTab)&&match(p.sku+' '+p.name+' '+p.cat);});
+ var h=topBar('Products',num(D.products.length)+' products · gold and silver catalog',appLink('Product Uploads',ic('up')+'Excel upload')+appLink('Products',ic('plus')+'Add product','gold'));
+ h+='<div class="tabs">'+[['all','All'],['Gold','Gold'],['Silver','Silver']].map(function(t){return '<button class="tab'+(S.catTab===t[0]?' on':'')+'" onclick="S.catTab=\''+t[0]+'\';draw()">'+t[1]+'</button>';}).join('')+'<span class="muted" style="align-self:center;margin-left:8px">'+num(list.length)+' shown</span></div>';
+ h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px">'+list.slice(0,120).map(function(p){return '<article class="card" style="padding:0;overflow:hidden"><div class="prod-img" style="background:'+(p.metal==='Silver'?'#EEF1F5':'#F6F0E1')+'">'+(p.img?'<img src="'+esc(p.img)+'" alt="'+esc(p.sku)+'" loading="lazy">':'<span class="muted">No photo</span>')+'</div><div style="padding:14px 16px"><div style="display:flex;align-items:center;gap:8px"><b style="font-family:Manrope,sans-serif">'+esc(p.sku)+'</b><span class="chip '+(p.metal==='Silver'?'c-pro':'c-prod')+'" style="margin-left:auto">'+p.metal+'</span></div><div class="muted" style="margin-top:4px;min-height:34px">'+esc(p.name)+'</div><div style="display:flex;align-items:center;gap:8px;margin-top:10px"><span style="font-weight:700">'+(p.cost?money(p.cost,2):'—')+'</span><span class="muted">'+(p.gram?num(p.gram,2)+' g':'')+'</span></div><div style="display:flex;gap:8px;margin-top:10px">'+appLink('Products',ic('copy',16)+'Duplicate','ghost sm')+appLink('Products','Add','sm')+'</div></div></article>';}).join('')+'</div>';
+ if(list.length>120)h+='<p class="muted" style="margin-top:16px">Showing the first 120. Search to narrow down.</p>';
+ return h;}
+
+/* ---------- BASKET ---------- */
+function basket(){var b=D.basket, tot=b.reduce(function(a,x){return a+x.qty*x.cost;},0);
+ var h=topBar('Basket',b.length+' item'+(b.length===1?'':'s')+' waiting to become an order',appLink('Basket','Create order in app','gold'),true);
+ h+='<div class="flex"><section class="card" style="flex:2 1 520px">'+(b.length?b.map(function(x){return '<div class="row" style="padding:16px 0">'+thumb(x.img,x.metal,x.sku,64)+'<div style="flex:1;min-width:0"><div style="font-weight:700;font-family:Manrope,sans-serif">'+esc(x.sku)+'</div><div class="muted">'+esc(x.name)+'</div><div class="muted">'+esc([x.metal,x.color,x.by&&('added by '+x.by)].filter(Boolean).join(' · '))+'</div></div><div style="font-weight:700;width:70px;text-align:center">'+num(x.qty)+' pcs</div><div style="width:110px;text-align:right;font-weight:700">'+(x.cost?money(x.qty*x.cost,2):'—')+'</div></div>';}).join(''):'<p class="muted">The basket is empty.</p>')+'</section>';
+ h+='<aside class="card" style="flex:1 1 300px"><h2 class="h2">Summary</h2><div class="row"><span>Items</span><b style="margin-left:auto">'+b.length+'</b></div><div class="row"><span>Pieces</span><b style="margin-left:auto">'+num(b.reduce(function(a,x){return a+x.qty;},0))+'</b></div><div class="row"><span>Estimated total</span><b style="margin-left:auto;font-family:Manrope,sans-serif;font-size:20px">'+money(tot,2)+'</b></div><div style="margin-top:12px">'+appLink('Basket','Create order','')+'</div></aside></div>';
+ return h;}
+
+/* ---------- ORDERS ---------- */
+function orders(){var tabs=[['open','Open'],['prod','In production'],['part','Partially shipped'],['pro','Proforma'],['done','Closed'],['all','All']];
+ var f={open:function(o){return !o.closed;},prod:function(o){return /production/i.test(o.status);},part:function(o){return /Partially/.test(o.status);},pro:function(o){return /Proforma/.test(o.status);},done:function(o){return o.closed;},all:function(){return true;}};
+ var list=D.orders.filter(f[S.ordTab]).filter(function(o){return match(o.no+' '+o.cust+' '+o.metal+' '+o.usta);}).sort(function(a,b){return b.date.localeCompare(a.date);});
+ if(!S.sel||!D.orders.some(function(o){return o.no===S.sel;}))S.sel=list[0]&&list[0].no;
+ var h=topBar('Orders','Every order, from proforma to shipped',appLink('Orders',ic('up')+'Upload Excel to order')+'<button class="btn gold" onclick="go(\'basket\')">'+ic('plus')+'New order</button>');
+ h+='<div class="tabs">'+tabs.map(function(t){return '<button class="tab'+(S.ordTab===t[0]?' on':'')+'" onclick="S.ordTab=\''+t[0]+'\';draw()">'+t[1]+' '+D.orders.filter(f[t[0]]).length+'</button>';}).join('')+'</div>';
+ h+='<div class="flex"><section class="card" style="flex:3 1 560px;padding:8px 10px;overflow-x:auto"><table><thead><tr><th>Order</th><th>Customer</th><th>Metal</th><th>Progress</th><th>Due</th><th>Status</th></tr></thead><tbody>'+list.map(function(o){var p=o.qty?Math.min(100,Math.round(o.shipped/o.qty*100)):0;return '<tr class="click'+(o.no===S.sel?' sel':'')+'" onclick="S.sel=\''+o.no+'\';draw()"><td style="white-space:nowrap"><b>'+esc(o.no)+'</b><div class="muted">'+dt(o.date)+'</div></td><td>'+esc(o.cust)+'</td><td class="'+(o.metal==='Silver'?'s':'g')+'">'+esc(o.metal)+'</td><td style="min-width:150px"><div class="bar"><i style="width:'+p+'%"></i></div><div class="muted" style="margin-top:4px">'+num(o.shipped)+' / '+num(o.qty)+' pcs</div></td><td>'+dt(o.due)+'</td><td>'+statusChip(o)+'</td></tr>';}).join('')+'</tbody></table>'+(list.length?'':'<p class="muted" style="padding:12px">No orders here.</p>')+'</section>';
+ var o=D.orders.find(function(x){return x.no===S.sel;});
+ if(o){var ls=D.lines.filter(function(l){return l.order===o.no;});
+  var hist=D.ships.filter(function(s){return s.shipped&&s.orders.some(function(x){return x.order===o.no;});}).map(function(s){var x=s.orders.find(function(y){return y.order===o.no;});return {date:s.date,no:s.no,pcs:x.pcs,grams:x.grams};});
+  var openQ=ls.reduce(function(a,l){return a+l.openQty;},0), openG=ls.reduce(function(a,l){return a+l.openGrams;},0);
+  h+='<aside class="card" style="flex:1 1 340px;align-self:flex-start"><div class="k">Selected order</div><div class="v" style="font-size:24px">'+esc(o.no)+'</div><div class="muted">'+esc([o.cust,o.type,o.usta].filter(Boolean).join(' · '))+'</div><div style="margin-top:10px">'+statusChip(o)+'</div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:16px"><div class="tile"><div class="muted">Ordered</div><b>'+num(o.qty)+' pcs</b></div><div class="tile"><div class="muted">Shipped</div><b>'+num(o.shipped)+' pcs</b></div><div class="tile"><div class="muted">'+(o.metal==='Silver'?'Silver weighed':'Products')+'</div><b>'+(o.metal==='Silver'?gr(o.silverGrams):ls.length)+'</b></div><div class="tile"><div class="muted">Final total</div><b>'+money(o.total,2)+'</b></div></div>';
+  h+='<h2 class="h2" style="margin-top:20px">Shipment history</h2>'+hist.map(function(x){return '<div class="row"><div style="flex:1"><b>'+dt(x.date)+'</b><div class="muted">'+esc(x.no)+'</div></div><div style="text-align:right"><b>'+num(x.pcs)+' pcs</b><div class="muted">'+gr(x.grams)+'</div></div></div>';}).join('')+'<div class="row"><div style="flex:1"><b>Now</b><div class="muted">not shipped yet</div></div><div style="text-align:right"><b>'+num(openQ)+' pcs</b><div class="muted">'+gr(openG)+'</div></div></div>';
+  h+='<h2 class="h2" style="margin-top:20px">Products · '+ls.length+'</h2>'+ls.slice(0,8).map(function(l){return '<div class="row">'+thumb(l.img,l.metal,l.sku,40)+'<div style="flex:1;min-width:0"><b>'+esc(l.sku||'No SKU')+'</b><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(l.name)+'</div></div><div class="muted" style="text-align:right">'+num(l.shipped)+' / '+num(l.ordered)+'</div></div>';}).join('')+(ls.length>8?'<p class="muted">+ '+(ls.length-8)+' more</p>':'');
+  h+='<div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">'+appLink('Orders','Production entry','')+appLink('Orders',ic('up')+'Upload Excel')+(o.pdf?'<a class="btn ghost" href="'+esc(o.pdf)+'" target="_blank" rel="noopener">'+ic('doc')+'Order PDF</a>':'')+'</div></aside>';}
+ h+='</div>';return h;}
+
+/* ---------- PRODUCTION ---------- */
+function steps(n){return '<div style="display:flex;gap:6px">'+STAGES.map(function(s,i){var k=i+1, done=k<n, cur=k===n;return '<span class="step" title="'+s.n+'" style="background:'+(done?'#E2B53E':cur?'#14161C':'#fff')+';color:'+(done?'#14161C':cur?'#E2B53E':'#9AA0AE')+';border:'+(done||cur?'0':'1px solid #E1E3EA')+'"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+s.d+'"/></svg></span>';}).join('')+'</div>';}
+function stChip(n){var c=['c-pro','c-pro','c-open','c-open','c-prod','c-part','c-ship'][n]||'c-pro';return '<span class="chip '+c+'">'+(n?STAGES[n-1].n:'Not started')+'</span>';}
+function lineRow(l,o){return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EEF0F4">'+thumb(l.img,l.metal,l.sku,44)+'<div style="flex:1 1 240px;min-width:0"><b>'+esc(l.sku||'No SKU')+'</b><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc([o?o.no+' · '+o.cust:'',num(l.ordered)+' pcs',l.shipped?num(l.shipped)+' shipped':'',l.name,l.gram?num(l.gram,2)+' g/pc':''].filter(Boolean).join(' · '))+'</div></div>'+stChip(stageOf(l))+steps(stageOf(l))+'</div>';}
+function prod(){var oo=openOrders().filter(function(o){return !/Proforma/.test(o.status)||D.lines.some(function(l){return l.order===o.no&&l.stage>0;});});
+ var list=oo.filter(function(o){return (S.prodTab==='all'||o.metal===S.prodTab)&&match(o.no+' '+o.cust+' '+o.usta+' '+D.lines.filter(function(l){return l.order===o.no;}).map(function(l){return l.sku;}).join(' '));}).sort(function(a,b){return (a.due||'9').localeCompare(b.due||'9');});
+ var h=topBar('Production','Open orders · stage of every product',appLink('Production','Open in app')+appLink('Production',ic('doc')+'Production PDF'));
+ h+='<div class="tabs">'+[['all','All'],['Silver','Silver'],['Gold','Gold']].map(function(t){return '<button class="tab'+(S.prodTab===t[0]?' on':'')+'" onclick="S.prodTab=\''+t[0]+'\';draw()">'+t[1]+'</button>';}).join('')+'<div style="margin-left:auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center" class="muted">'+STAGES.map(function(s){return '<span style="display:inline-flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+s.d+'"/></svg>'+s.n+'</span>';}).join('')+'</div></div>';
+ h+='<section class="card" style="padding:6px 22px">';
+ list.forEach(function(o){var ls=D.lines.filter(function(l){return l.order===o.no;});var p=o.qty?Math.min(100,Math.round(o.shipped/o.qty*100)):0;
+  if(ls.length>3){var op=!!S.open[o.no];var openG=ls.reduce(function(a,l){return a+l.openGrams;},0);
+   h+='<div style="border-bottom:1px solid #EEF0F4"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:16px 0"><div class="thumb'+(o.metal==='Silver'?' sv':'')+'" style="width:52px;height:52px">'+esc(ini(o.cust))+'</div><div style="flex:1 1 260px;min-width:0"><div style="font-family:Manrope,sans-serif;font-weight:800;font-size:16px">'+esc(o.no)+' · '+ls.length+' products</div><div class="muted">'+esc([o.usta,o.cust,o.metal+' '+o.type.toLowerCase(),o.due?'due '+dt(o.due):''].filter(Boolean).join(' · '))+'</div></div><div style="flex:0 1 200px;min-width:150px"><div class="bar"><i style="width:'+p+'%"></i></div><div class="muted" style="margin-top:4px">'+num(o.shipped)+' / '+num(o.qty)+' pcs shipped</div></div><span class="chip c-part">Grouped</span><button class="btn ghost sm" onclick="S.open[\''+o.no+'\']='+(!op)+';draw(true)">'+(op?'Hide products':'Show products')+'</button></div>';
+   if(op){h+='<div style="padding:0 0 14px 66px">'+ls.map(function(l){return lineRow(l);}).join('')+'<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding-top:12px">'+(o.metal==='Silver'?'<span class="muted">This batch so far</span><b style="font-family:Manrope,sans-serif">'+gr(openG)+'</b>':'')+'<span style="margin-left:auto"></span>'+appLink('Production','Production entry','')+'</div></div>';}
+   h+='</div>';}
+  else ls.forEach(function(l){h+=lineRow(l,o);});});
+ if(!list.length)h+='<p class="muted">No open production.</p>';
+ h+='</section><p class="muted" style="margin-top:12px">Moving a product to the next stage and entering grams is still done in the app; it shows here on refresh.</p>';
+ return h;}
+
+/* ---------- SHIPMENTS ---------- */
+function ship(){var list=D.ships.filter(function(s){return match(s.no+' '+s.waybill+' '+s.orders.map(function(o){return o.order;}).join(' '));});
+ var month=D.at.slice(0,7), sm=D.ships.filter(function(s){return s.shipped&&String(s.date).slice(0,7)===month;});
+ var h=topBar('Shipments','Every box that left Istanbul, with weight and value',appLink('Shipments',ic('plus')+'New shipment','gold'));
+ h+='<div class="flex"><section style="flex:2 1 520px;display:flex;flex-direction:column;gap:16px">'+list.map(function(s){return '<article class="card"><div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px"><div><div class="k">'+(s.shipped?dt(s.date):'Preparing')+'</div><div class="v" style="font-size:22px">'+esc(s.no)+'</div></div><span class="chip '+(s.shipped?'c-ship':'c-pro')+'">'+(s.shipped?'Shipped':'Draft')+'</span><div style="margin-left:auto;text-align:right"><div class="muted">Waybill</div><b>'+esc(s.waybill||'—')+'</b></div></div><div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px"><div class="tile"><div class="muted">Pieces</div><b>'+num(s.pcs)+'</b></div><div class="tile"><div class="muted">Silver</div><b>'+gr(s.silver)+'</b></div><div class="tile"><div class="muted">Gold</div><b>'+gr(s.gold)+'</b></div><div class="tile"><div class="muted">Value</div><b>'+(s.value?money(s.value,2):'—')+'</b></div></div><div class="muted" style="margin-top:12px">'+s.orders.map(function(o){return esc(o.order)+' ('+num(o.pcs)+' pcs)';}).join(' · ')+'</div><div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">'+(s.pdf?'<a class="btn ghost sm" href="'+esc(s.pdf)+'" target="_blank" rel="noopener">'+ic('doc',16)+'Packing list</a>':'')+appLink('Shipments','Open in app','ghost sm')+'</div></article>';}).join('')+'</section>';
+ h+='<aside class="card" style="flex:1 1 300px;align-self:flex-start"><h2 class="h2">Deliver to</h2><div class="muted" style="line-height:1.6">DHL Express Service Point Washington<br>3130 V St NE, Washington, DC 20018<br>Account 411363431</div><h2 class="h2" style="margin-top:22px">This month</h2><div class="row"><span>Shipments</span><b style="margin-left:auto">'+sm.length+'</b></div><div class="row"><span>Pieces</span><b style="margin-left:auto">'+num(sm.reduce(function(a,s){return a+s.pcs;},0))+'</b></div><div class="row"><span>Silver</span><b style="margin-left:auto">'+gr(sm.reduce(function(a,s){return a+s.silver;},0))+'</b></div><div class="row"><span>Gold</span><b style="margin-left:auto">'+gr(sm.reduce(function(a,s){return a+s.gold;},0))+'</b></div><div class="row"><span>Goods value</span><b style="margin-left:auto">'+money(sm.reduce(function(a,s){return a+s.value;},0),2)+'</b></div></aside></div>';
+ return h;}
+
+/* ---------- FINANCE ---------- */
+function finance(){var f=D.finance, cover=f.owed?Math.round(f.cash/f.owed*100):100;
+ var h=topBar('Finance','Net position, supplier balances and every movement',appLink('Suppliers',ic('plus')+'Add activity','gold')+appLink('Suppliers','Add cash'),true);
+ h+='<section style="background:#14161C;color:#fff;border-radius:22px;padding:28px;display:flex;flex-wrap:wrap;gap:28px;align-items:center"><div style="flex:1 1 260px"><div style="font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:#C9CDD6">Net position</div><div style="font-family:Manrope,sans-serif;font-size:46px;font-weight:800;color:'+(f.net<0?'#FF8A80':'#7EE2A8')+';letter-spacing:-1px">'+money(f.net)+'</div><div style="color:#C9CDD6;font-size:13px">Cash covers '+cover+'% of what we owe</div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;flex:2 1 520px">'+[['Cash on hand',money(f.cash)],['Owed to suppliers',money(f.owed)],['Labor owed',money(f.labor)],['Silver owed',num(f.silver,0)+' g'],['Fine gold owed',num(f.gold,2)+' g'],['Other owed',money(f.other)]].map(function(x,i){return '<div style="background:#1F2330;border-radius:14px;padding:14px"><div style="color:#C9CDD6;font-size:12px">'+x[0]+'</div><b style="font-size:19px'+(i===4?';color:#E2B53E':'')+'">'+x[1]+'</b></div>';}).join('')+'</div></section>';
+ var mx=Math.max.apply(null,f.balances.map(function(b){return b.total;}).concat([1]));
+ h+='<div class="flex" style="margin-top:16px"><section class="card" style="flex:2 1 520px"><h2 class="h2">Supplier balances</h2>'+f.balances.map(function(b){var parts=[b.labor?'labor '+money(b.labor):'',b.silver?'silver '+num(b.silver,2)+' g':'',b.gold?'gold '+num(b.gold,2)+' g':'',b.other?'other '+money(b.other):''].filter(Boolean).join(' · ');return '<div class="row"><div class="thumb">'+esc(ini(b.name))+'</div><div style="flex:1;min-width:0"><div style="font-weight:700">'+esc(b.name)+' <span class="muted">· '+esc(b.type)+'</span></div><div class="muted">'+esc(parts)+'</div><div class="bar" style="margin-top:8px"><i style="width:'+Math.round(b.total/mx*100)+'%"></i></div></div><div style="text-align:right;min-width:120px"><b style="font-family:Manrope,sans-serif;font-size:18px">'+money(b.total)+'</b>'+(b.pdf?'<div><a href="'+esc(b.pdf)+'" target="_blank" rel="noopener" style="font-size:12px">Statement PDF</a></div>':'')+'</div></div>';}).join('')+'</section>';
+ h+='<section class="card" style="flex:1 1 340px"><h2 class="h2">Recent activity</h2>'+f.moves.slice(0,15).map(moveRow).join('')+'</section></div>';
+ return h;}
+
+var PAGES={home:home,products:products,basket:basket,orders:orders,prod:prod,ship:ship,finance:finance};
+function draw(keepFocus){nav();if(!D)return;var m=document.getElementById('main');var had=keepFocus&&document.activeElement&&document.activeElement.id==='q';var pos=had?document.activeElement.selectionStart:0;m.innerHTML=PAGES[S.page]();if(had){var q=document.getElementById('q');if(q){q.focus();q.setSelectionRange(pos,pos);}}}
+var API='https://script.google.com/macros/s/AKfycbxp-ICFFy396THVc5tRMRhtWMIjYr4OyKM3nQh8x1PiBmgO20kaF9rIIpw6zC0mzk2UlQ/exec';
+function store(k,v){try{if(v===undefined)return localStorage.getItem(k);if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v);}catch(e){return null;}}
+function keyForm(msg){document.getElementById('main').innerHTML='<div class="card" style="max-width:440px;margin:10vh auto"><h2 class="h2">Muscat Hub</h2><p class="muted">'+(msg||'Enter your access key once. This browser will remember it.')+'</p><form onsubmit="store(\'hubKey\',this.k.value.trim());load();return false"><input name="k" type="password" autocomplete="off" aria-label="Access key" placeholder="Access key" style="width:100%;height:44px;border:1px solid #E1E3EA;border-radius:12px;padding:0 14px;font:inherit;margin:8px 0 12px"><button class="btn gold" type="submit">Open</button></form></div>';}
+function load(){var m=location.hash.match(/k=([^&]+)/);if(m){store('hubKey',decodeURIComponent(m[1]));history.replaceState(null,'',location.pathname);}
+ var key=store('hubKey');if(!key){keyForm();return;}
+ if(!D){var c=store('hubData');if(c){try{D=JSON.parse(c);draw();}catch(e){}}}
+ if(!D)document.getElementById('main').innerHTML='<div class="loading"><div class="spin"></div>Loading live data…</div>';
+ setSync('Updating…');
+ fetch(API+'?api='+encodeURIComponent(key)).then(function(r){return r.json();}).then(function(j){
+  if(!j.ok){if(/access/i.test(j.error)){store('hubKey',null);store('hubData',null);D=null;keyForm('That key did not work. Try again.');}else fail(j.error);return;}
+  D=j.data;store('hubData',JSON.stringify(D));draw(true);setSync('');
+ }).catch(function(e){fail(e&&e.message||e);});}
+function fail(msg){if(D){setSync('Could not refresh. Showing data from '+D.at+'.');return;}document.getElementById('main').innerHTML='<div class="card"><h2 class="h2">Could not load data</h2><p class="muted">'+esc(msg)+'</p><button class="btn" onclick="load()">Try again</button></div>';}
+function setSync(t){var s=document.getElementById('sync');if(!s){s=document.createElement('div');s.id='sync';s.setAttribute('role','status');s.style.cssText='position:fixed;right:16px;bottom:16px;background:#14161C;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:9;display:none';document.body.appendChild(s);}s.textContent=t;s.style.display=t?'block':'none';}
+nav();load();
+</script>
+</body>
+</html>
