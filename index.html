@@ -107,6 +107,20 @@ img[data-zoom]{cursor:zoom-in}
 .rochip{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:10px;background:rgba(226,181,62,.18);color:#E2B53E;font-size:11px;font-weight:700}
 body.ro [onclick*="openQuick("],body.ro [onclick*="openNewOrder("],body.ro [onclick*="openOrderEdit("],body.ro [onclick*="addLine("],body.ro [onclick*="addToBasket("],body.ro [onclick*="basketQty("],body.ro [onclick*="cancelShip("],body.ro [onclick*="closeOrder("],body.ro [onclick*="deleteLine("],body.ro [onclick*="openCustom("],body.ro [onclick*="openFin("],body.ro [onclick*="openFinalize("],body.ro [onclick*="openImport("],body.ro [onclick*="openNewShip("],body.ro [onclick*="openProd("],body.ro [onclick*="openProduct("],body.ro [onclick*="runImport("],body.ro [onclick*="saveSetting("],body.ro [onclick*="setStage("],body.ro [onclick*="go('basket')"],body.ro .hero-qo{display:none!important}
 body.ro .stepb{pointer-events:none}
+.qcb.qcon{box-shadow:0 0 0 3px rgba(226,181,62,.25)}
+.qc-head{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.qc-last{font-size:12px;font-weight:600;margin-top:4px}.qc-last.ok{color:#1E6B3A}.qc-last.bad{color:#B42318}
+.qc-prog{display:flex;align-items:center;gap:12px;margin:4px 0 10px}.qc-prog .bar{flex:1}
+.qc-list{display:flex;flex-direction:column;gap:8px}
+.qc-row{display:flex;align-items:center;flex-wrap:wrap;gap:10px;padding:12px 14px;border:1.5px solid #E7E9EF;border-radius:14px;cursor:pointer;background:#fff;transition:border-color .15s,background .15s}
+.qc-row input[type=checkbox]{position:absolute;opacity:0;width:1px;height:1px}
+.qc-box{width:24px;height:24px;border-radius:8px;border:1.5px solid #C9CDD6;display:flex;align-items:center;justify-content:center;color:transparent;flex:none}
+.qc-row.on{border-color:#1E6B3A;background:#F1F8F3}.qc-row.on .qc-box{background:#1E6B3A;border-color:#1E6B3A;color:#fff}
+.qc-row input:focus-visible+.qc-box{outline:2px solid #E2B53E;outline-offset:2px}
+.qc-l{flex:1 1 160px;font-weight:600;min-width:0}
+.qc-exp{font-size:12.5px;font-weight:600;background:#FBF3DC;color:#7A5A06;border-radius:8px;padding:4px 9px;max-width:100%;overflow-wrap:anywhere}.qc-exp.warn{background:#FDECEC;color:#B42318}
+.qc-in{width:130px;height:38px}
+.qc-diff{font-size:12px;font-weight:700}.qc-diff.ok{color:#1E6B3A}.qc-diff.bad{color:#B42318}
 .only-m{display:none}
 .kpi{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;position:relative;transition:border-color .15s,box-shadow .15s}
 .kpi:hover{border-color:#E2B53E;box-shadow:0 6px 18px rgba(20,22,28,.06)}
@@ -234,11 +248,11 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-25-25';
+var APPV='2026-11-26-26';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
-var ICON={bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',gem:'<path d="M6 3h12l3 6-9 12L3 9z"/><path d="M3 9h18"/>',bag:'<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',list:'<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',tool:'<path d="M14 4l6 6-3 3-6-6z"/><path d="M11 7L4 14l6 6 7-7"/>',plane:'<path d="M2 12l20-8-6 18-4-7z"/><path d="M12 15l4-4"/>',cash:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',plus:'<path d="M12 5v14M5 12h14"/>',up:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/>',doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/>',refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'};
+var ICON={check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',camera:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',gem:'<path d="M6 3h12l3 6-9 12L3 9z"/><path d="M3 9h18"/>',bag:'<path d="M5 8h14l-1 12H6z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',list:'<path d="M8 6h13M8 12h13M8 18h13"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/>',tool:'<path d="M14 4l6 6-3 3-6-6z"/><path d="M11 7L4 14l6 6 7-7"/>',plane:'<path d="M2 12l20-8-6 18-4-7z"/><path d="M12 15l4-4"/>',cash:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="3"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',plus:'<path d="M12 5v14M5 12h14"/>',up:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/>',doc:'<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5"/>',refresh:'<path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/>',copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/>'};
 var STAGES=[{n:'Ordered',d:'M8 4h8v3H8zM6 6h12v15H6zM9 12h6M9 16h4'},{n:'Wax',d:'M12 3c3 4 5 6 5 10a5 5 0 0 1-10 0c0-4 2-6 5-10z'},{n:'Casting',d:'M12 2c2 4 6 6 6 11a6 6 0 0 1-12 0c0-3 2-5 3-6 0 3 1 4 3 4 0-3-1-6 0-9z'},{n:'Setting',d:'M6 3h12l3 6-9 12L3 9zM3 9h18'},{n:'Polish & Laser',d:'M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z'},{n:'Ready',d:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM8 12l3 3 5-6'}];
 var NAV=[['home','Home','home'],['products','Products','gem'],['basket','Basket','bag'],['orders','Orders','list'],['prod','Production','tool'],['ship','Shipments','plane'],['finance','Finance','cash']];
 function ic(n,s){return '<svg width="'+(s||18)+'" height="'+(s||18)+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[n]+'</svg>';}
@@ -366,18 +380,74 @@ function orders(){var tabs=[['open','Open'],['prod','In production'],['part','Pa
 function steps(n,l){var busy=l&&S.busy[l.id], locked=!l, silver=l&&l.metal==='Silver';return '<div style="display:flex;gap:6px'+(busy?';opacity:.45':'')+'">'+STAGES.map(function(s,i){var k=i+1, done=k<n, cur=k===n, can=!!l&&!busy, to=cur?k-1:k, act;
  var tip=cur?s.n+' (click to step back)':'Move to '+s.n;
  if(k===6&&!cur&&!silver&&n<4){can=false;tip='Setting comes before Ready';}
+ else if(k===6&&!cur&&!silver&&l&&!qcPassed(l)){if(n>=5){tip='QC checklist first';act='openQC(\''+l.id+'\')';}else{can=false;tip='QC checklist comes before Ready';}}
  else if(k===4&&silver){can=false;tip='No setting step for silver';}
  else if(k===4&&!cur){tip='Setting · enter stone info';act='openSetting(\''+l.id+'\')';}
  if(can&&!act)act='setStage(\''+l.id+'\','+to+')';
  var st='background:'+(done?'#E2B53E':cur?'#14161C':'#fff')+';color:'+(done?'#14161C':cur?'#E2B53E':'#9AA0AE')+';border:'+(done||cur?'0':'1px solid #E1E3EA');
  var svg='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+s.d+'"/></svg>';
- return can?'<button class="step stepb" title="'+tip+'" aria-label="'+esc(l.sku)+': '+tip+'" style="'+st+'" onclick="'+act+'">'+svg+'</button>':'<span class="step" title="'+tip+'" style="'+st+';opacity:.55">'+svg+'</span>';}).join('')+'</div>';}
+ var qcx=(k===5&&l&&!silver)?qcStep(l,n):'';return (can?'<button class="step stepb" title="'+tip+'" aria-label="'+esc(l.sku)+': '+tip+'" style="'+st+'" onclick="'+act+'">'+svg+'</button>':'<span class="step" title="'+tip+'" style="'+st+';opacity:.55">'+svg+'</span>')+qcx;}).join('')+'</div>';}
 function stChip(n){var c=['c-pro','c-pro','c-open','c-open','c-prod','c-part','c-ship'][n]||'c-pro';return '<span class="chip '+c+'">'+(n?STAGES[n-1].n:'Not started')+'</span>';}
 function lineRow(l,o){return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #EEF0F4">'+thumb(l.img,l.metal,l.sku,44)+'<div style="flex:1 1 240px;min-width:0"><b>'+esc(l.sku||'No SKU')+'</b><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc([o?o.no+' · '+o.cust:'',num(l.ordered)+' pcs',l.shipped?num(l.shipped)+' shipped':'',l.name,l.gram?num(l.gram,2)+' g/pc':''].filter(Boolean).join(' · '))+'</div></div>'+stChip(stageOf(l))+steps(stageOf(l),l)+(o&&!o.closed?(stageOf(l)===6?'<button class="btn ghost sm" onclick="openProd(\''+o.no+'\',\''+l.id+'\')">Entry</button>':'<button class="btn ghost sm" disabled style="opacity:.45;cursor:not-allowed" title="Mark Ready first">Entry</button>'):'')+'</div>';}
+/* ===== QC checklist (gold only): after Polish & Laser, before Ready ===== */
+var QCI='M9 3h6v3H9zM7 4.5H5V21h14V4.5h-2M8.5 13.5l2.5 2.5 4.5-5';
+function qcProd(l){return l.metal!=='Silver'?D.products.find(function(p){return p.metal!=='Silver'&&l.sku&&p.sku.toUpperCase()===String(l.sku).toUpperCase();}):null;}
+function qcCat(l){var p=qcProd(l), t=((p&&p.cat)||'')+' '+(l.name||'')+' '+(l.notes||'')+' '+(l.sku||'');
+ if(/earring|hoop|stud|jacket|küpe/i.test(t))return 'Earrings';if(/\bring\b|yüzük|^R\d/i.test(t)||/^R\d|^YZK/i.test(l.sku||''))return 'Ring';
+ if(/bracelet|bangle|anklet|bileklik|kelepçe/i.test(t))return 'Bracelet';if(/necklace|pendant|chain|kolye/i.test(t))return 'Necklace';return 'Other';}
+function qcPassed(l){return !!(l.qc&&l.qc.result==='pass');}
+function qcColor(l){var p=qcProd(l), c=(l.goldColor||l.color||(p&&p.color)||'').trim();if(!c)return 'Not specified · ask';c=c.toLowerCase();return /white/.test(c)?'White gold':/rose|pink/.test(c)?'Rose gold':/yellow|sar/.test(c)?'Yellow gold':c;}
+function qcItems(l){var p=qcProd(l)||{}, cat=qcCat(l), nt=l.notes||'', it=[];
+ var karat=/\b10\s?k\b/i.test(nt)?'10K':/\b18\s?k\b/i.test(nt)?'18K':/\b9\s?k\b/i.test(nt)?'9K':'14K';
+ var motif=p.size||p.style||((String(l.name||'').match(/\d+(?:[.,]\d+)?\s?(?:cm|mm)|\b(?:extra large|large|medium|small|mini|big|thin|thick)\b/i)||[])[0])||'As in photo';
+ var size=l.size||((nt.match(/size\s*([0-9.,]+\s?[a-z]?)/i)||[])[1])||'';
+ var stones=[p.stones,l.stoneCount?l.stoneCount+' stones':'',l.carat?l.carat+' ct':''].filter(Boolean).join(' · ')||(/diamond|dia\b|stone|taş|sapphire|ruby|emerald/i.test((l.name||'')+' '+nt)?'See notes':'None');
+ var A=function(k,lab,exp,inp){it.push({k:k,label:lab,expected:exp||'',input:inp||''});};
+ A('sku','SKU & design match photo',(l.sku||'No SKU')+(l.name?' · '+l.name:''));
+ A('color','Metal color',qcColor(l));
+ A('karat','Karat stamp',karat);
+ if(cat==='Ring'){A('size','Ring size',size||'Not specified · ask');A('motif','Motif size',motif);}
+ if(cat==='Bracelet'){A('length','Bracelet length',size||'Standard');A('motif','Motif size',motif);A('clasp','Clasp opens and locks securely','');A('links','Links / jump rings closed and soldered','');}
+ if(cat==='Necklace'){A('length','Chain length',size||'Standard');A('motif','Pendant / motif size',motif);A('chain','Chain style',(String(l.name||'').match(/paperclip|tennis|rolo|box|cable|braided|ball/i)||['As ordered'])[0]);A('hang','Pendant hangs straight and centred','');A('clasp','Clasp opens and locks securely','');A('links','Jump rings closed and soldered','');}
+ if(cat==='Earrings'){A('pair','Pair identical (size, color, stones)','2 pcs = 1 pair');A('motif','Motif size',motif);A('posts','Posts straight, backs / hoop closure secure','');}
+ if(stones!=='None'){A('diamond','Diamond / stone check',stones);A('secure','All stones set tight, none missing or loose','');}
+ if(cat==='Ring')A('band','Band round, smooth inside','');
+ A('gram','Gram check','Catalog '+(p.gram||l.gram?num(p.gram||l.gram,2)+' g/pc':'—'),'gram');
+ A('polish','Polish & finish: no scratches, porosity or marks','');
+ if(nt&&!/^Taşlı \(/.test(nt))A('custom','Personalization / special note done',nt.split('\n')[0].slice(0,80));
+ A('qty','All pieces checked',num(l.ordered)+' pcs');
+ return {cat:cat,items:it};}
+function qcStep(l,n){var ok=qcPassed(l), fail=l.qc&&l.qc.result==='fail', can=n>=5&&!S.busy[l.id];
+ var tip=ok?'QC passed'+(l.qc.by?' by '+l.qc.by:'')+' · click to view':fail?'QC needs fix · click to re-check':n>=5?'QC checklist':'QC checklist (after Polish & Laser)';
+ var st='background:'+(ok?'#1E6B3A':can?'#fff':'#fff')+';color:'+(ok?'#fff':fail?'#B42318':can?'#14161C':'#9AA0AE')+';border:'+(ok?'0':fail?'1.5px solid #B42318':can?'1.5px solid #E2B53E':'1px solid #E1E3EA');
+ var svg='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+QCI+'"/></svg>';
+ return can||ok?'<button class="step stepb qcb'+(can&&!ok?' qcon':'')+'" title="'+tip+'" aria-label="'+esc(l.sku||'Product')+': '+tip+'" style="'+st+'" onclick="openQC(\''+l.id+'\')">'+svg+'</button>':'<span class="step" title="'+tip+'" style="'+st+';opacity:.55">'+svg+'</span>';}
+function openQC(id){var l=D.lines.find(function(x){return x.id===id;});if(!l)return;var Q=qcItems(l), prev={}, ro=D.role==='view';
+ try{(JSON.parse(l.qc&&l.qc.items||'[]')||[]).forEach(function(x){prev[x.k]=x;});}catch(e){}
+ S.qc={id:id,items:Q.items};
+ var h=mhead('QC checklist · '+esc(Q.cat),esc(l.order+' · '+num(l.ordered)+' pcs'));
+ h+='<div class="qc-head">'+thumb(l.img||(IMGC&&IMGC[l.photo])||'',l.metal,l.sku,64)+'<div style="min-width:0"><b>'+esc(l.sku||'No SKU')+'</b><div class="muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(l.name||'')+'</div>'+(l.qc?'<div class="qc-last '+(l.qc.result==='pass'?'ok':'bad')+'">Last QC: '+(l.qc.result==='pass'?'passed':'needs fix')+(l.qc.by?' · '+esc(l.qc.by):'')+(l.qc.at?' · '+esc(l.qc.at):'')+'</div>':'')+'</div></div>';
+ h+='<div class="qc-prog"><div class="bar"><i id="qc_bar" style="width:0%"></i></div><span id="qc_cnt" class="muted"></span></div><div class="qc-list">';
+ Q.items.forEach(function(x,i){var pv=prev[x.k]||{};h+='<label class="qc-row'+(pv.ok?' on':'')+'" id="qcr'+i+'"><input type="checkbox" id="qc'+i+'"'+(pv.ok?' checked':'')+(ro?' disabled':'')+' onchange="qcTick()"><span class="qc-box">'+ic('check',14)+'</span><span class="qc-l">'+esc(x.label)+'</span>'+(x.expected?'<span class="qc-exp'+(/ask|—/.test(x.expected)?' warn':'')+'">'+esc(x.expected)+'</span>':'')+(x.input==='gram'?'<input class="inp qc-in" type="number" step="0.01" min="0" id="qcv'+i+'" placeholder="Weighed g/pc" value="'+esc(pv.value||'')+'"'+(ro?' disabled':'')+' oninput="qcGram('+i+')" onclick="event.stopPropagation()"><span class="qc-diff" id="qcd'+i+'"></span>':'')+'</label>';});
+ h+='</div><label class="fld" style="margin-top:12px">Note <span class="muted">(what needs fixing, remarks)</span><textarea class="inp qo-ta" id="qc_note"'+(ro?' disabled':'')+'>'+esc(l.qc&&l.qc.note||'')+'</textarea></label>';
+ h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap"><button class="btn ghost" onclick="closeModal()">'+(ro?'Close':'Cancel')+'</button>'+(ro?'':'<button class="btn ghost" id="qc_fail" onclick="saveQC(\'fail\')">Needs fix</button><button class="btn gold" id="qc_pass" onclick="saveQC(\'pass\')">'+(stageOf(l)<6?'Pass QC → Ready':'Pass QC')+'</button>')+'</div>';
+ modal(h);qcTick();Q.items.forEach(function(x,i){if(x.input==='gram')qcGram(i);});}
+function qcGram(i){var x=S.qc.items[i], v=Number(fv('qcv'+i)), d=document.getElementById('qcd'+i);var m=String(x.expected).match(/([0-9.]+)\s?g/);if(!d)return;
+ if(!v||!m){d.textContent='';return;}var c=Number(m[1]), pc=(v-c)/c*100;d.textContent=(pc>=0?'+':'')+pc.toFixed(0)+'%';d.className='qc-diff '+(Math.abs(pc)>15?'bad':'ok');}
+function qcTick(){var n=S.qc.items.length, k=0;S.qc.items.forEach(function(x,i){var c=document.getElementById('qc'+i);if(c&&c.checked)k++;var r=document.getElementById('qcr'+i);if(r)r.classList.toggle('on',!!(c&&c.checked));});
+ var b=document.getElementById('qc_bar');if(b)b.style.width=Math.round(k/n*100)+'%';var t=document.getElementById('qc_cnt');if(t)t.textContent=k+' / '+n+' checked';
+ var p=document.getElementById('qc_pass');if(p){p.disabled=k<n;p.style.opacity=k<n?.45:1;}}
+function saveQC(res){var l=D.lines.find(function(x){return x.id===S.qc.id;});if(!l)return;
+ var items=S.qc.items.map(function(x,i){var c=document.getElementById('qc'+i);return {k:x.k,label:x.label,expected:x.expected,ok:!!(c&&c.checked),value:x.input?fv('qcv'+i):''};});
+ if(res==='pass'&&items.some(function(x){return !x.ok;})){toast('Tick every check first');return;}
+ if(res==='fail'&&!fv('qc_note')&&items.every(function(x){return x.ok;})){toast('Write what needs fixing');document.getElementById('qc_note').focus();return;}
+ busyBtn(res==='pass'?'qc_pass':'qc_fail','Saving…');
+ post({op:'qc',lineId:l.id,result:res,items:items,note:fv('qc_note')}).then(function(r){l.qc=r.qc;l.qc.note=fv('qc_note');l.stage=r.stage;saved();closeModal();draw(true);toast((l.sku||'Product')+(res==='pass'?' · QC passed'+(r.stage===6?' → Ready':''):' · QC needs fix'));})
+ .catch(function(e){['qc_pass','qc_fail'].forEach(function(id){var b=document.getElementById(id);if(b){b.disabled=false;b.style.opacity=1;}});var b1=document.getElementById('qc_pass');if(b1)b1.textContent='Pass QC';var b2=document.getElementById('qc_fail');if(b2)b2.textContent='Needs fix';toast('Not saved: '+(e.message||e));});}
 function prod(){var oo=openOrders().filter(function(o){return !/Proforma/.test(o.status)||D.lines.some(function(l){return l.order===o.no&&l.stage>0;});});
  var list=oo.filter(function(o){return (S.prodTab==='all'||o.metal===S.prodTab)&&match(o.no+' '+o.cust+' '+o.usta+' '+D.lines.filter(function(l){return l.order===o.no;}).map(function(l){return l.sku;}).join(' '));}).sort(function(a,b){return (a.due||'9').localeCompare(b.due||'9');});
  var h=topBar('Production','Open orders · stage of every product','<button class="btn ghost" onclick="pdfBtn(this,\'production\',\'\')">'+ic('doc')+'Production PDF</button>');
- h+='<div class="tabs">'+[['all','All'],['Silver','Silver'],['Gold','Gold']].map(function(t){return '<button class="tab'+(S.prodTab===t[0]?' on':'')+'" onclick="S.prodTab=\''+t[0]+'\';draw()">'+t[1]+'</button>';}).join('')+'<div style="margin-left:auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center" class="muted">'+STAGES.map(function(s){return '<span style="display:inline-flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+s.d+'"/></svg>'+s.n+'</span>';}).join('')+'</div></div>';
+ h+='<div class="tabs">'+[['all','All'],['Silver','Silver'],['Gold','Gold']].map(function(t){return '<button class="tab'+(S.prodTab===t[0]?' on':'')+'" onclick="S.prodTab=\''+t[0]+'\';draw()">'+t[1]+'</button>';}).join('')+'<div style="margin-left:auto;display:flex;flex-wrap:wrap;gap:12px;align-items:center" class="muted">'+STAGES.map(function(s){return '<span style="display:inline-flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+s.d+'"/></svg>'+s.n+'</span>'+(s.n==='Polish & Laser'?'<span style="display:inline-flex;align-items:center;gap:6px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+QCI+'"/></svg>QC (gold)</span>':'');}).join('')+'</div></div>';
  h+='<section class="card" style="padding:6px 22px">';
  list.forEach(function(o){var ls=D.lines.filter(function(l){return l.order===o.no;});var p=o.qty?Math.min(100,Math.round(o.shipped/o.qty*100)):0;
   if(ls.length>3){var op=!!S.open[o.no];var openG=(o.silverOpen||0)+ls.filter(function(l){return l.metal!=='Silver';}).reduce(function(a,l){return a+l.openGrams;},0);
@@ -386,7 +456,7 @@ function prod(){var oo=openOrders().filter(function(o){return !/Proforma/.test(o
    h+='</div>';}
   else ls.forEach(function(l){h+=lineRow(l,o);});});
  if(!list.length)h+='<p class="muted">No open production.</p>';
- h+='</section><p class="muted" style="margin-top:12px">Click a stage icon to move a product there; click the current stage to step back. Setting asks for stone info. Produced quantities and grams go in through Production entry.</p>';
+ h+='</section><p class="muted" style="margin-top:12px">Click a stage icon to move a product there; click the current stage to step back. Setting asks for stone info. Gold pieces pass the QC checklist before Ready. Produced quantities and grams go in through Production entry.</p>';
  return h;}
 
 /* ---------- SHIPMENTS ---------- */
