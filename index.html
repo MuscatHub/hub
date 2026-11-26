@@ -99,6 +99,7 @@ img[data-zoom]{cursor:zoom-in}
 .pcard .pa .full{grid-column:1/-1}
 .row.mv{cursor:pointer;border-radius:10px}.row.mv:hover{background:#F8F9FB}
 .mv-ed{flex:none;margin-left:8px;padding:4px 10px;font-size:12px}
+.spec-h{font-weight:700;margin:6px 0 10px;padding-top:12px;border-top:1px solid #E6E8EE}
 .mvt td,.mvt th{padding:8px 6px}
 .note{background:#FFF8E6;border:1px solid #F3E2B0;color:#5C4304;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:16px}
 @media (max-width:900px){.shell{flex-direction:column}.side{width:100%;height:auto;position:static;flex-direction:row;flex-wrap:wrap;padding:12px}.brand{padding:8px 12px;width:100%}.price{display:none}.nl{width:auto}.main{padding:20px 16px}.grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.search{margin-left:0;min-width:0;width:100%}}
@@ -256,7 +257,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-26-34';
+var APPV='2026-11-26-35';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -420,23 +421,24 @@ function qcCat(l){var p=qcProd(l), t=((p&&p.cat)||'')+' '+(l.name||'')+' '+(l.no
  if(/bracelet|bangle|anklet|bileklik|kelepçe/i.test(t))return 'Bracelet';if(/necklace|pendant|chain|kolye/i.test(t))return 'Necklace';return 'Other';}
 function qcPassed(l){return !!(l.qc&&l.qc.result==='pass');}
 function qcColor(l){var p=qcProd(l), c=(l.goldColor||l.color||(p&&p.color)||'').trim();if(!c)return 'Not specified · ask';c=c.toLowerCase();return /white/.test(c)?'White gold':/rose|pink/.test(c)?'Rose gold':/yellow|sar/.test(c)?'Yellow gold':c;}
-function qcItems(l){var p=qcProd(l)||{}, cat=qcCat(l), nt=l.notes||'', it=[];
- var karat=/\b10\s?k\b/i.test(nt)?'10K':/\b18\s?k\b/i.test(nt)?'18K':/\b9\s?k\b/i.test(nt)?'9K':'14K';
- var motif=p.size||p.style||((String(l.name||'').match(/\d+(?:[.,]\d+)?\s?(?:cm|mm)|\b(?:extra large|large|medium|small|mini|big|thin|thick)\b/i)||[])[0])||'As in photo';
+function qcItems(l){var p=qcProd(l)||{}, sp=p.spec||{}, cat=specCat(p.cat)||qcCat(l), nt=l.notes||'', it=[];
+ var karat=/\b10\s?k\b/i.test(nt)?'10K':/\b18\s?k\b/i.test(nt)?'18K':/\b9\s?k\b/i.test(nt)?'9K':(sp.karat||(l.metal==='Silver'?'925':'14K'));
+ var motif=sp.motifSize||p.size||p.style||((String(l.name||'').match(/\d+(?:[.,]\d+)?\s?(?:cm|mm)|\b(?:extra large|large|medium|small|mini|big|thin|thick)\b/i)||[])[0])||'As in photo';
  var size=l.size||((nt.match(/size\s*([0-9.,]+\s?[a-z]?)/i)||[])[1])||'';
- var stones=[p.stones,l.stoneCount?l.stoneCount+' stones':'',l.carat?l.carat+' ct':''].filter(Boolean).join(' · ')||(/diamond|dia\b|stone|taş|sapphire|ruby|emerald/i.test((l.name||'')+' '+nt)?'See notes':'None');
+ var stones=sp.stoneType==='None'?'None':[sp.stoneType,sp.stoneSize,p.stones,l.stoneCount?l.stoneCount+' stones':'',l.carat?l.carat+' ct':''].filter(Boolean).join(' · ')||(/diamond|dia\b|stone|taş|sapphire|ruby|emerald/i.test((l.name||'')+' '+nt)?'See notes':'None');
  var A=function(k,lab,exp,inp){it.push({k:k,label:lab,expected:exp||'',input:inp||''});};
  A('sku','SKU & design match photo',(l.sku||'No SKU')+(l.name?' · '+l.name:''));
- A('color','Metal color',qcColor(l));
- A('karat','Muscat & karat stamp','Muscat · '+karat);
- if(cat==='Ring'){A('size','Ring size',size||'Not specified · ask');A('motif','Motif size',motif);}
- if(cat==='Bracelet'){A('length','Bracelet length',size||'Standard');A('motif','Motif size',motif);A('chain','Chain style',(String(l.name||'').match(/paperclip|tennis|rolo|box|cable|braided|ball|bangle|cuff/i)||['As ordered'])[0]);A('clasp','Clasp opens and locks securely','');A('links','Links / jump rings closed and soldered','');}
- if(cat==='Necklace'){A('length','Chain length',size||'Standard');A('motif','Pendant / motif size',motif);A('chain','Chain style',(String(l.name||'').match(/paperclip|tennis|rolo|box|cable|braided|ball/i)||['As ordered'])[0]);A('hang','Pendant hangs straight and centred','');A('clasp','Clasp opens and locks securely','');A('links','Jump rings closed and soldered','');}
- if(cat==='Earrings'){A('pair','Pair identical (size, color, stones)','2 pcs = 1 pair');A('motif','Motif size',motif);A('posts','Posts straight, backs / hoop closure secure','');}
+ A('color',l.metal==='Silver'?'Plating':'Metal color',l.metal==='Silver'&&sp.plating?sp.plating:qcColor(l));
+ A('karat','Muscat & karat stamp',sp.stamp||('Muscat · '+karat));
+ if(cat==='Ring'){A('size','Ring size',size||p.size||'Not specified · ask');A('motif','Motif size',motif);}
+ if(cat==='Bracelet'){A('length','Bracelet length',size||sp.length||'Standard');A('motif','Motif size',motif);A('chain','Chain style',sp.chain||(String(l.name||'').match(/paperclip|tennis|rolo|box|cable|braided|ball|bangle|cuff/i)||['As ordered'])[0]);A('clasp','Clasp opens and locks securely',sp.clasp||'');A('links','Links / jump rings closed and soldered','');}
+ if(cat==='Necklace'){A('length','Chain length',size||sp.length||'Standard');A('motif','Pendant / motif size',motif);A('chain','Chain style',sp.chain||(String(l.name||'').match(/paperclip|tennis|rolo|box|cable|braided|ball/i)||['As ordered'])[0]);A('hang','Pendant hangs straight and centred','');A('clasp','Clasp opens and locks securely',sp.clasp||'');A('links','Jump rings closed and soldered','');}
+ if(cat==='Earrings'){if(sp.earType)A('etype','Earring type',sp.earType);A('pair','Pair identical (size, color, stones)','2 pcs = 1 pair');A('motif','Size / hoop diameter',motif);A('posts','Posts straight, backs / closure secure',sp.back||'');}
  if(stones!=='None'){A('diamond','Diamond / stone check',stones);A('secure','All stones set tight, none missing or loose','');}
  if(cat==='Ring')A('band','Band round, smooth inside','');
  A('gram','Gram check','Catalog '+(p.gram||l.gram?num(p.gram||l.gram,2)+' g/pc':'—'),'gram');
  A('polish','Polish & finish: no scratches, porosity or marks','');
+ if(sp.custom)A('pcustom','Product customization done',sp.custom.slice(0,120));
  if(nt&&!/^Taşlı \(/.test(nt))A('custom','Personalization / special note done',nt.split('\n')[0].slice(0,80));
  A('qty','All pieces checked',num(l.ordered)+' pcs');
  return {cat:cat,items:it};}
@@ -723,18 +725,42 @@ function openProduct(metal,id,mode){var p=metal?D.products.find(function(x){retu
   +'<label class="fld">Style<input class="inp" id="pr_style" value="'+v(p.style)+'"></label>'
   +'<label class="fld">Metal color<input class="inp" id="pr_mc" value="'+v(p.color)+'"></label>'
   +'<label class="fld">Gram / pc<input class="inp" type="number" min="0" step="0.01" id="pr_g" value="'+v(p.gram)+'"></label>'
-  +'<label class="fld silver-only"><span id="pr_lab_l">Labor $ / g</span><input class="inp" type="number" min="0" step="0.01" id="pr_labv" value="'+v(p.labor)+'"></label>'
   +'<input type="hidden" id="pr_lab" value="'+v(p.labor)+'"><input type="hidden" id="pr_sp" value="'+v(p.stonePc)+'"><input type="hidden" id="pr_setp" value="'+v(p.settingPc)+'">'
   +'<label class="fld gold-only" style="grid-column:span 2">Notes<input class="inp" id="pr_notes" value="'+v(p.notes)+'"></label>'
   +'<label class="fld" style="grid-column:1/-1">Image URL<input class="inp" id="pr_img" value="'+v(p.img)+'" placeholder="https://…"></label>'
-  +'<label class="fld" style="grid-column:1/-1">or upload a photo<input class="inp" style="padding-top:8px" type="file" id="pr_photo" accept="image/*"></label></div>'
+  +'<label class="fld" style="grid-column:1/-1">or upload a photo<input class="inp" style="padding-top:8px" type="file" id="pr_photo" accept="image/*"></label>'
+  +'<div id="pr_spec" style="grid-column:1/-1"></div></div>'
   +'<datalist id="dl_cat">'+Array.from(new Set(D.products.map(function(x){return x.cat;}).filter(Boolean))).sort().map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>';
  h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn gold" id="pr_save" onclick="saveProduct(\''+(edit?esc(p.sku):'')+'\')">'+(edit?'Save changes':'Add product')+'</button></div>';
- modal(h);prMetal();}
-function prMetal(){var s=(document.querySelector('input[name=pr_m]:checked')||{}).value==='Silver';[].forEach.call(document.querySelectorAll('.gold-only'),function(e){e.style.display=s?'none':'';});[].forEach.call(document.querySelectorAll('.silver-only'),function(e){e.style.display=s?'':'none';});}
-function saveProduct(key){var m=(document.querySelector('input[name=pr_m]:checked')||{}).value;if(!fv('pr_sku')){toast('Enter a SKU');document.getElementById('pr_sku').focus();return;}
+ PS=Object.assign({},p.spec||{});modal(h);prMetal();var ce=document.getElementById('pr_cat');if(ce)ce.addEventListener('input',specDraw);}
+function prMetal(){var s=(document.querySelector('input[name=pr_m]:checked')||{}).value==='Silver';[].forEach.call(document.querySelectorAll('.gold-only'),function(e){e.style.display=s?'none':'';});[].forEach.call(document.querySelectorAll('.silver-only'),function(e){e.style.display=s?'':'none';});specDraw();}
+/* category + metal specific parameters (sheet "Product Specs") */
+var PS={};
+function specCat(t){t=String(t||'');if(/earring|hoop|stud|jacket|küpe/i.test(t))return 'Earrings';if(/\bring\b|yüzük/i.test(t))return 'Ring';if(/bracelet|bangle|anklet|bileklik|kelepçe/i.test(t))return 'Bracelet';if(/necklace|pendant|chain|kolye/i.test(t))return 'Necklace';return '';}
+function specFields(cat,silver){var F=[], CH=['Cable','Rolo','Paperclip','Tennis','Box','Ball','Braided','Snake','Bangle'], CL=['Lobster','Spring ring','Box clasp','Toggle','None (bangle)'];
+ if(silver){F.push(['karat','Silver','sel',['925']]);F.push(['plating','Plating','sel',['Rhodium','Gold plated (GP)','Rose plated','None']]);}
+ else F.push(['karat','Karat','sel',['14K','10K','18K','9K']]);
+ if(cat==='Ring')F.push(['motifSize','Motif size','dl',['Small','Medium','Large']]);
+ if(cat==='Bracelet'){F.push(['length','Length','txt','e.g. 16 + 2 cm']);F.push(['chain','Chain type','dl',CH]);F.push(['clasp','Clasp','dl',CL]);F.push(['motifSize','Motif size','dl',['Small','Medium','Large']]);}
+ if(cat==='Necklace'){F.push(['length','Chain length','txt','e.g. 40 + 5 cm']);F.push(['chain','Chain type','dl',CH]);F.push(['motifSize','Pendant / motif size','dl',['Small','Medium','Large']]);F.push(['clasp','Clasp','dl',CL]);}
+ if(cat==='Earrings'){F.push(['earType','Earring type','dl',['Stud','Hoop','Drop','Huggie','Ear cuff','Climber']]);F.push(['motifSize','Size / hoop diameter','txt','e.g. Medium or 12 mm']);F.push(['back','Back / closure','dl',['Push back','Screw back','Hinged hoop','Lever back','Clip']]);}
+ if(silver){F.push(['stoneType','Stones','dl',['Zircon','Colored zircon','Opal','Enamel','None']]);F.push(['stoneSize','Stone size','txt','e.g. 2 mm']);}
+ else{F.push(['stoneType','Stones','dl',['Diamond','Sapphire','Ruby','Emerald','Colored stone','None']]);F.push(['stoneSize','Stone size / carat','txt','e.g. 1.5 mm · 0.27 ct']);}
+ F.push(['stamp','Stamp','txt',silver?'Muscat · 925':'Muscat · 14K']);return F;}
+function specRead(){[].forEach.call(document.querySelectorAll('[data-spec]'),function(e){PS[e.getAttribute('data-spec')]=e.value.trim();});return PS;}
+function specDraw(){var box=document.getElementById('pr_spec');if(!box)return;specRead();var silver=(document.querySelector('input[name=pr_m]:checked')||{}).value==='Silver', cat=specCat(fv('pr_cat')), F=specFields(cat,silver);
+ var h='<div class="spec-h">'+(cat||'General')+' parameters · '+(silver?'Silver':'Gold')+(cat?'':' <span class="muted">(set the category to Ring, Bracelet, Necklace or Earrings for more fields)</span>')+'</div><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">';
+ F.forEach(function(f){var val=PS[f[0]]||'', id='ps_'+f[0];
+  if(f[2]==='sel')h+='<label class="fld">'+f[1]+'<select class="inp" id="'+id+'" data-spec="'+f[0]+'"><option value="">—</option>'+f[3].concat(val&&f[3].indexOf(val)<0?[val]:[]).map(function(o){return '<option'+(o===val?' selected':'')+'>'+esc(o)+'</option>';}).join('')+'</select></label>';
+  else if(f[2]==='dl')h+='<label class="fld">'+f[1]+'<input class="inp" id="'+id+'" data-spec="'+f[0]+'" list="dl_'+id+'" value="'+esc(val)+'"><datalist id="dl_'+id+'">'+f[3].map(function(o){return '<option value="'+esc(o)+'">';}).join('')+'</datalist></label>';
+  else h+='<label class="fld">'+f[1]+'<input class="inp" id="'+id+'" data-spec="'+f[0]+'" value="'+esc(val)+'" placeholder="'+esc(f[3])+'"></label>';});
+ h+='<label class="fld" style="grid-column:1/-1">Customization note <span class="muted">(engraving, special finish, anything QC must check)</span><textarea class="inp qo-ta" id="ps_custom" data-spec="custom">'+esc(PS.custom||'')+'</textarea></label></div>';
+ box.innerHTML=h;}
+function specOut(){var o=specRead(), allowed={custom:1};specFields(specCat(fv('pr_cat')),(document.querySelector('input[name=pr_m]:checked')||{}).value==='Silver').forEach(function(f){allowed[f[0]]=1;});var r={};Object.keys(o).forEach(function(k){if(allowed[k])r[k]=o[k];});return r;}
+function saveProduct(key){var m=(document.querySelector('input[name=pr_m]:checked')||{}).value;if(!fv('pr_sku')){toast('Enter a SKU');document.getElementById('pr_sku').focus();return;}var sp=specOut();
  busyBtn('pr_save','Saving…');
- readFile(document.getElementById('pr_photo')).then(function(photo){return post({op:'productSave',metal:m,mode:key?'edit':'add',key:key,photo:photo,fields:{sku:fv('pr_sku'),description:fv('pr_desc'),category:fv('pr_cat'),motif:fv('pr_motif'),stones:fv('pr_st'),size:fv('pr_size'),style:fv('pr_style'),metalColor:fv('pr_mc'),gram:fv('pr_g'),labor:m==='Silver'?fv('pr_labv'):fv('pr_lab'),stonePc:fv('pr_sp'),settingPc:fv('pr_setp'),notes:fv('pr_notes'),imageUrl:fv('pr_img')}});})
+ readFile(document.getElementById('pr_photo')).then(function(photo){return post({op:'productSave',metal:m,mode:key?'edit':'add',key:key,photo:photo,fields:{sku:fv('pr_sku'),description:fv('pr_desc'),category:fv('pr_cat'),motif:fv('pr_motif'),stones:fv('pr_st'),size:fv('pr_size'),style:fv('pr_style'),metalColor:fv('pr_mc'),gram:fv('pr_g'),labor:fv('pr_lab'),stonePc:fv('pr_sp'),settingPc:fv('pr_setp'),notes:fv('pr_notes'),imageUrl:fv('pr_img')}});})
+ .then(function(r){return post({op:'productSpec',metal:r.metal||m,sku:r.sku||fv('pr_sku'),spec:sp}).then(function(){return r;});})
  .then(function(r){closeModal();toast(r.sku+(key?' saved':' added to the '+r.metal.toLowerCase()+' catalog'));load();})
  .catch(function(e){var b=document.getElementById('pr_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent=key?'Save changes':'Add product';}toast('Not saved: '+(e.message||e));});}
 
