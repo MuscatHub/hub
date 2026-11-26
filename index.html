@@ -99,6 +99,7 @@ img[data-zoom]{cursor:zoom-in}
 .pcard .pa .full{grid-column:1/-1}
 .row.mv{cursor:pointer;border-radius:10px}.row.mv:hover{background:#F8F9FB}
 .mv-ed{flex:none;margin-left:8px;padding:4px 10px;font-size:12px}
+.pk{width:17px;height:17px;accent-color:#C99A1E;cursor:pointer;vertical-align:middle}
 .spec-h{font-weight:700;margin:6px 0 10px;padding-top:12px;border-top:1px solid #E6E8EE}
 .mvt td,.mvt th{padding:8px 6px}
 .note{background:#FFF8E6;border:1px solid #F3E2B0;color:#5C4304;border-radius:12px;padding:10px 14px;font-size:13px;margin-bottom:16px}
@@ -257,7 +258,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-26-35';
+var APPV='2026-11-27-36';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -386,9 +387,10 @@ function orders(){var tabs=[['open','Open'],['prod','In production'],['part','Pa
  var f={open:function(o){return !o.closed;},prod:function(o){return /production/i.test(o.status);},part:function(o){return /Partially/.test(o.status);},pro:function(o){return /Proforma/.test(o.status);},done:function(o){return o.closed;},all:function(){return true;}};
  var list=D.orders.filter(f[S.ordTab]).filter(function(o){return match(o.no+' '+o.cust+' '+o.metal+' '+o.usta);}).sort(function(a,b){return b.date.localeCompare(a.date);});
  if(!S.sel||!D.orders.some(function(o){return o.no===S.sel;}))S.sel=list[0]&&list[0].no;
- var h=topBar('Orders','Every order, from proforma to shipped','<button class="btn ghost" onclick="openImport(\'basketImport\')">'+ic('up')+'Upload Excel to order</button>'+'<button class="btn gold" onclick="go(\'basket\')">'+ic('plus')+'New order</button>');
+ S.pk=S.pk||[];S.pk=S.pk.filter(function(n){return D.orders.some(function(o){return o.no===n;});});
+ var h=topBar('Orders','Every order, from proforma to shipped',(S.pk.length?'<button class="btn gold" onclick="pdfMulti(this)">'+ic('doc')+'Combined PDF ('+S.pk.length+')</button><button class="btn ghost" onclick="S.pk=[];draw(true)">Clear</button>':'')+'<button class="btn ghost" onclick="openImport(\'basketImport\')">'+ic('up')+'Upload Excel to order</button>'+'<button class="btn gold" onclick="go(\'basket\')">'+ic('plus')+'New order</button>');
  h+='<div class="tabs">'+tabs.map(function(t){return '<button class="tab'+(S.ordTab===t[0]?' on':'')+'" onclick="S.ordTab=\''+t[0]+'\';draw()">'+t[1]+' '+D.orders.filter(f[t[0]]).length+'</button>';}).join('')+'</div>';
- h+='<div class="flex"><section class="card" style="flex:3 1 560px;padding:8px 10px;overflow-x:auto"><table class="otable"><thead><tr><th>Order</th><th>Customer</th><th>Metal</th><th>Progress</th><th>Due</th><th>Status</th></tr></thead><tbody>'+list.map(function(o){var p=o.qty?Math.min(100,Math.round(o.shipped/o.qty*100)):0;return '<tr class="click'+(o.no===S.sel?' sel':'')+'" onclick="selOrder(\''+o.no+'\')"><td style="white-space:nowrap"><b>'+esc(o.no)+'</b><div class="muted">'+dt(o.date)+'</div></td><td>'+esc(o.cust)+'</td><td class="'+(o.metal==='Silver'?'s':'g')+'">'+esc(o.metal)+'</td><td style="min-width:150px"><div class="bar"><i style="width:'+p+'%"></i></div><div class="muted" style="margin-top:4px">'+num(o.shipped)+' / '+num(o.qty)+' pcs</div></td><td>'+dt(o.due)+'</td><td>'+statusChip(o)+'</td></tr>';}).join('')+'</tbody></table>'+(list.length?'':'<p class="muted" style="padding:12px">No orders here.</p>')+'</section>';
+ h+='<div class="flex"><section class="card" style="flex:3 1 560px;padding:8px 10px;overflow-x:auto"><table class="otable"><thead><tr><th style="width:28px"><input type="checkbox" class="pk" aria-label="Select all orders in this list" title="Select all" onclick="event.stopPropagation();pickAll(this.checked)"'+(list.length&&list.every(function(o){return S.pk.indexOf(o.no)>=0;})?' checked':'')+'></th><th>Order</th><th>Customer</th><th>Metal</th><th>Progress</th><th>Due</th><th>Status</th></tr></thead><tbody>'+list.map(function(o){var p=o.qty?Math.min(100,Math.round(o.shipped/o.qty*100)):0;return '<tr class="click'+(o.no===S.sel?' sel':'')+'" onclick="selOrder(\''+o.no+'\')"><td onclick="event.stopPropagation()"><input type="checkbox" class="pk" aria-label="Select '+esc(o.no)+' for combined PDF" onclick="pick(\''+o.no+'\',this.checked)"'+(S.pk.indexOf(o.no)>=0?' checked':'')+'></td><td style="white-space:nowrap"><b>'+esc(o.no)+'</b><div class="muted">'+dt(o.date)+'</div></td><td>'+esc(o.cust)+'</td><td class="'+(o.metal==='Silver'?'s':'g')+'">'+esc(o.metal)+'</td><td style="min-width:150px"><div class="bar"><i style="width:'+p+'%"></i></div><div class="muted" style="margin-top:4px">'+num(o.shipped)+' / '+num(o.qty)+' pcs</div></td><td>'+dt(o.due)+'</td><td>'+statusChip(o)+'</td></tr>';}).join('')+'</tbody></table>'+(list.length?'':'<p class="muted" style="padding:12px">No orders here.</p>')+'</section>';
  var o=D.orders.find(function(x){return x.no===S.sel;});
  if(o){var ls=D.lines.filter(function(l){return l.order===o.no;});
   var hist=D.ships.filter(function(s){return s.shipped&&s.orders.some(function(x){return x.order===o.no;});}).map(function(s){var x=s.orders.find(function(y){return y.order===o.no;});return {date:s.date,no:s.no,pcs:x.pcs,grams:x.grams};});
@@ -669,6 +671,17 @@ function saveNewOrder(){var m=(document.querySelector('input[name=o_metal]:check
 function pdfBtn(el,kind,ref){var w=window.open('','_blank');if(w){w.document.write('<p style="font-family:Arial;padding:24px">Building PDF… this can take up to a minute.</p>');}
  var t=el.textContent;el.style.opacity=.5;el.style.pointerEvents='none';
  post({op:'pdf',kind:kind,ref:ref}).then(function(r){el.style.opacity=1;el.style.pointerEvents='';if(w&&r.url)w.location=r.url;else if(r.url)toast('PDF ready');load();})
+ .catch(function(e){el.style.opacity=1;el.style.pointerEvents='';if(w)w.close();toast('PDF failed: '+(e.message||e));});}
+
+/* several orders' usta forms in one PDF, one under another */
+function pick(no,on){S.pk=S.pk||[];var i=S.pk.indexOf(no);if(on&&i<0)S.pk.push(no);if(!on&&i>=0)S.pk.splice(i,1);draw(true);}
+function pickAll(on){var nos=[].map.call(document.querySelectorAll('.otable tbody tr'),function(tr){var b=tr.querySelector('b');return b&&b.textContent;}).filter(Boolean);S.pk=S.pk||[];nos.forEach(function(n){var i=S.pk.indexOf(n);if(on&&i<0)S.pk.push(n);if(!on&&i>=0)S.pk.splice(i,1);});draw(true);}
+function pdfMulti(el){if(!S.pk||!S.pk.length)return;var refs=D.orders.filter(function(o){return S.pk.indexOf(o.no)>=0;}).sort(function(a,b){return b.date.localeCompare(a.date);}).map(function(o){return o.no;});
+ var w=window.open('','_blank');if(w)w.document.write('<p style="font-family:Arial;padding:24px">Building one PDF for '+refs.length+' orders… this can take up to a minute.</p>');
+ var t=el.innerHTML;el.style.opacity=.5;el.style.pointerEvents='none';
+ post({op:'pdf',kind:'orders',refs:refs}).then(function(r){el.style.opacity=1;el.style.pointerEvents='';var u=String(r.url||'');if(u.indexOf('b64:')!==0)throw new Error('No PDF returned');
+  var bin=atob(u.slice(4)),a=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);
+  var url=URL.createObjectURL(new Blob([a],{type:'application/pdf'}));if(w)w.location=url;else window.open(url,'_blank');})
  .catch(function(e){el.style.opacity=1;el.style.pointerEvents='';if(w)w.close();toast('PDF failed: '+(e.message||e));});}
 
 /* shipments */
