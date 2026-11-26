@@ -255,7 +255,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-26-29';
+var APPV='2026-11-26-30';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -281,6 +281,7 @@ function openOrders(){return D.orders.filter(function(o){return !o.closed;});}
 function stageOf(l){return l.stage>=1&&l.stage<=6?l.stage:0;}
 
 /* ---------- HOME ---------- */
+function ago(iso){var d=(Date.now()-new Date(iso).getTime())/60000;if(d<1)return 'just now';if(d<60)return Math.round(d)+' min ago';if(d<1440)return Math.round(d/60)+' h ago';if(d<2880)return 'yesterday';return Math.round(d/1440)+' days ago';}
 function home(){var oo=openOrders(), inprod=oo.filter(function(o){return /production/i.test(o.status);}).length;
  var month=D.at.slice(0,7), sm=D.ships.filter(function(s){return s.shipped&&String(s.date).slice(0,7)===month;});
  var pcsM=sm.reduce(function(a,s){return a+s.pcs;},0);
@@ -297,6 +298,7 @@ function home(){var oo=openOrders(), inprod=oo.filter(function(o){return /produc
  h+='<div class="grid4 kpis">'+[['Open orders',oo.length,inprod+' in production','list',"go('orders')"],['Shipped this month',num(pcsM)+' pcs',sm.length+' shipment'+(sm.length===1?'':'s'),'plane',"go('ship')"],['Cash on hand',money(D.finance.cash),'after all app moves','cash',"go('finance')"],['Owed to suppliers',money(D.finance.owed),D.finance.balances.length+' suppliers open','tool',"go('finance')"]].map(function(k){return '<button class="card kpi" onclick="'+k[4]+'"><div class="kpi-i">'+ic(k[3],16)+'</div><div class="k">'+k[0]+'</div><div class="v">'+k[1]+'</div><div class="muted" style="margin-top:6px">'+k[2]+'</div></button>';}).join('')+'</div>';
  h+='<div class="flex" style="margin-top:16px"><div style="flex:2 1 520px;display:flex;flex-direction:column;gap:16px;min-width:0">';
  var due=oo.filter(function(o){return o.due;}).sort(function(a,b){return a.due.localeCompare(b.due);}).slice(0,5);
+ if(D.team&&D.team.length)h+='<section class="card"><div style="display:flex;align-items:center"><h2 class="h2">Team access</h2><span class="muted" style="margin-left:auto;font-size:12px">only you see this</span></div>'+D.team.map(function(t){var on=t.last&&(Date.now()-new Date(t.last).getTime())<15*60000;return '<div class="row"><div class="thumb">'+esc(ini(t.name))+'</div><div style="flex:1;min-width:0"><div style="font-weight:600">'+esc(t.name)+' <span class="chip '+(t.role==='full'?'c-prod':'c-pro')+'" style="height:20px;font-size:11px">'+(t.role==='full'?'Full':'View only')+'</span></div><div class="muted">'+(t.last?(on?'<b style="color:#1E6B3A">● Online now</b>':'Last seen '+ago(t.last)):'Never opened')+'</div></div><div class="muted" style="text-align:right;font-size:12px">'+(t.visits?t.week+' this week<br>'+t.visits+' total':'')+'</div></div>';}).join('')+'</section>';
  h+='<section class="card"><div style="display:flex;align-items:center"><h2 class="h2">Due soon</h2><a href="#" onclick="go(\'orders\');return false" style="margin-left:auto;font-size:13px">All orders</a></div>'+due.map(function(o){return '<div class="row" style="cursor:pointer" onclick="S.sel=\''+o.no+'\';go(\'orders\')"><div class="thumb'+(o.metal==='Silver'?' sv':'')+'">'+esc(ini(o.cust))+'</div><div style="flex:1;min-width:0"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(o.no)+' · '+esc(o.cust)+'</div><div class="muted">'+num(o.shipped)+' / '+num(o.qty)+' pcs shipped · '+esc(o.metal)+(o.usta?' · '+esc(o.usta):'')+'</div></div><span class="chip c-prod">Due '+dt(o.due)+'</span></div>';}).join('')+'</section></div>';
  h+='<section class="card" style="flex:1 1 320px"><h2 class="h2">Recent activity</h2>'+D.finance.moves.slice(0,7).map(moveRow).join('')+(D.finance.moves.length>7?'<button class="btn ghost sm" style="margin-top:10px" onclick="S.allMoves=true;go(\'finance\')">See all activity</button>':'')+'</section></div>';
  return h;}
