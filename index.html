@@ -256,7 +256,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-26-33';
+var APPV='2026-11-26-34';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -723,19 +723,18 @@ function openProduct(metal,id,mode){var p=metal?D.products.find(function(x){retu
   +'<label class="fld">Style<input class="inp" id="pr_style" value="'+v(p.style)+'"></label>'
   +'<label class="fld">Metal color<input class="inp" id="pr_mc" value="'+v(p.color)+'"></label>'
   +'<label class="fld">Gram / pc<input class="inp" type="number" min="0" step="0.01" id="pr_g" value="'+v(p.gram)+'"></label>'
-  +'<label class="fld"><span id="pr_lab_l">Labor</span><input class="inp" type="number" min="0" step="0.01" id="pr_lab" value="'+v(p.labor)+'"></label>'
-  +'<label class="fld gold-only">Stone $ / pc<input class="inp" type="number" min="0" step="0.01" id="pr_sp" value="'+v(p.stonePc)+'"></label>'
-  +'<label class="fld gold-only">Setting $ / pc<input class="inp" type="number" min="0" step="0.01" id="pr_setp" value="'+v(p.settingPc)+'"></label>'
+  +'<label class="fld silver-only"><span id="pr_lab_l">Labor $ / g</span><input class="inp" type="number" min="0" step="0.01" id="pr_labv" value="'+v(p.labor)+'"></label>'
+  +'<input type="hidden" id="pr_lab" value="'+v(p.labor)+'"><input type="hidden" id="pr_sp" value="'+v(p.stonePc)+'"><input type="hidden" id="pr_setp" value="'+v(p.settingPc)+'">'
   +'<label class="fld gold-only" style="grid-column:span 2">Notes<input class="inp" id="pr_notes" value="'+v(p.notes)+'"></label>'
   +'<label class="fld" style="grid-column:1/-1">Image URL<input class="inp" id="pr_img" value="'+v(p.img)+'" placeholder="https://…"></label>'
   +'<label class="fld" style="grid-column:1/-1">or upload a photo<input class="inp" style="padding-top:8px" type="file" id="pr_photo" accept="image/*"></label></div>'
   +'<datalist id="dl_cat">'+Array.from(new Set(D.products.map(function(x){return x.cat;}).filter(Boolean))).sort().map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>';
  h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn gold" id="pr_save" onclick="saveProduct(\''+(edit?esc(p.sku):'')+'\')">'+(edit?'Save changes':'Add product')+'</button></div>';
  modal(h);prMetal();}
-function prMetal(){var s=(document.querySelector('input[name=pr_m]:checked')||{}).value==='Silver';[].forEach.call(document.querySelectorAll('.gold-only'),function(e){e.style.display=s?'none':'';});var l=document.getElementById('pr_lab_l');if(l)l.textContent=s?'Labor $ / g':'Labor (milyem)';}
+function prMetal(){var s=(document.querySelector('input[name=pr_m]:checked')||{}).value==='Silver';[].forEach.call(document.querySelectorAll('.gold-only'),function(e){e.style.display=s?'none':'';});[].forEach.call(document.querySelectorAll('.silver-only'),function(e){e.style.display=s?'':'none';});}
 function saveProduct(key){var m=(document.querySelector('input[name=pr_m]:checked')||{}).value;if(!fv('pr_sku')){toast('Enter a SKU');document.getElementById('pr_sku').focus();return;}
  busyBtn('pr_save','Saving…');
- readFile(document.getElementById('pr_photo')).then(function(photo){return post({op:'productSave',metal:m,mode:key?'edit':'add',key:key,photo:photo,fields:{sku:fv('pr_sku'),description:fv('pr_desc'),category:fv('pr_cat'),motif:fv('pr_motif'),stones:fv('pr_st'),size:fv('pr_size'),style:fv('pr_style'),metalColor:fv('pr_mc'),gram:fv('pr_g'),labor:fv('pr_lab'),stonePc:fv('pr_sp'),settingPc:fv('pr_setp'),notes:fv('pr_notes'),imageUrl:fv('pr_img')}});})
+ readFile(document.getElementById('pr_photo')).then(function(photo){return post({op:'productSave',metal:m,mode:key?'edit':'add',key:key,photo:photo,fields:{sku:fv('pr_sku'),description:fv('pr_desc'),category:fv('pr_cat'),motif:fv('pr_motif'),stones:fv('pr_st'),size:fv('pr_size'),style:fv('pr_style'),metalColor:fv('pr_mc'),gram:fv('pr_g'),labor:m==='Silver'?fv('pr_labv'):fv('pr_lab'),stonePc:fv('pr_sp'),settingPc:fv('pr_setp'),notes:fv('pr_notes'),imageUrl:fv('pr_img')}});})
  .then(function(r){closeModal();toast(r.sku+(key?' saved':' added to the '+r.metal.toLowerCase()+' catalog'));load();})
  .catch(function(e){var b=document.getElementById('pr_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent=key?'Save changes':'Add product';}toast('Not saved: '+(e.message||e));});}
 
