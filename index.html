@@ -123,6 +123,11 @@ body.ro .stepb{pointer-events:none}
 .qc-diff{font-size:12px;font-weight:700}.qc-diff.ok{color:#1E6B3A}.qc-diff.bad{color:#B42318}
 .btn-del{color:#B42318;border-color:#F2C4C0}.btn-del:hover{background:#FDECEC}
 .btn-red{background:#B42318;color:#fff;border:0}.btn-red:hover{background:#912018}
+.qo-res{display:flex;flex-direction:column;gap:6px;max-height:340px;overflow:auto;margin-top:8px}.qo-res:empty{display:none}
+.qo-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:8px 10px;border:1px solid #E7E9EF;border-radius:12px;background:#fff;font:inherit;color:#14161C;cursor:pointer}
+.qo-item:hover,.qo-item:focus{border-color:#E2B53E;background:#FFFBF0;outline:0}
+.qo-it{flex:1;min-width:0;display:flex;flex-direction:column}.qo-it span{font-size:13px;color:#5E6472;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qo-pickd{display:flex;align-items:center;gap:14px;padding:12px;border:1.5px solid #E2B53E;border-radius:14px;background:#FFFBF0;margin-top:6px}
 .only-m{display:none}
 .kpi{display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;position:relative;transition:border-color .15s,box-shadow .15s}
 .kpi:hover{border-color:#E2B53E;box-shadow:0 6px 18px rgba(20,22,28,.06)}
@@ -250,7 +255,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-26-28';
+var APPV='2026-11-26-29';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -312,7 +317,7 @@ function qoMode(mode){QO.mode=mode;var sku=mode==='sku';var d=new Date();d.setDa
   +'<div class="fld" style="grid-column:1/-1">Metal *<div class="seg qo-seg"><label><input type="radio" name="qo_m" value="Gold" onchange="qoMetal()">Gold</label><label><input type="radio" name="qo_m" value="Silver" onchange="qoMetal()">Silver</label></div></div>'
   +'<label class="fld">Customer name *<input class="inp" id="qo_cust" autocomplete="off" placeholder="e.g. Erica Barron"></label>'
   +'<label class="fld">Supplier *<select class="inp" id="qo_usta"><option value="">Choose metal first</option></select></label>'
-  +(sku?'<label class="fld" style="grid-column:1/-1">SKU *<input class="inp" id="qo_sku" list="qo_dl" placeholder="Choose metal, then type to search" autocomplete="off" oninput="qoSku()"><datalist id="qo_dl"></datalist><div class="muted" id="qo_skuinfo" style="margin-top:4px"></div></label>'
+  +(sku?'<div class="fld" style="grid-column:1/-1">SKU *<div id="qo_sel"></div><input class="inp" id="qo_sku" placeholder="Choose metal, then search SKU or name" autocomplete="off" oninput="qoSku()" onfocus="qoSku()"><div id="qo_res" class="qo-res"></div></div>'
        :'<label class="fld" style="grid-column:1/-1">Product description *<input class="inp" id="qo_title" autocomplete="off" placeholder="e.g. 14k name necklace, 45 cm"></label><label class="fld">Estimated gram / pc<input class="inp" type="number" min="0" step="0.01" id="qo_gram"></label>')
   +'<label class="fld">Qty<input class="inp" type="number" min="1" id="qo_q" value="1"></label>'
   +'<label class="fld">Color<input class="inp" id="qo_c" placeholder="yellow / white / rose"></label>'
@@ -326,9 +331,22 @@ function qoMode(mode){QO.mode=mode;var sku=mode==='sku';var d=new Date();d.setDa
  modal(h);}
 function qoMetal(){var m=(document.querySelector('input[name=qo_m]:checked')||{}).value;var u=document.getElementById('qo_usta');
  if(u){var cur=u.value;u.innerHTML='<option value="">Choose…</option>'+qoUstas(m).map(function(x){return '<option'+(x.name===cur?' selected':'')+'>'+esc(x.name)+'</option>';}).join('');}
- var dl=document.getElementById('qo_dl');if(dl){dl.innerHTML=D.products.filter(function(p){return p.metal===m;}).map(function(p){return '<option value="'+esc(p.sku)+'">'+esc(p.name)+'</option>';}).join('');var s=document.getElementById('qo_sku');s.placeholder='Type to search '+m.toLowerCase()+' SKUs';qoSku();}}
-function qoFind(){var m=(document.querySelector('input[name=qo_m]:checked')||{}).value, s=fv('qo_sku').toUpperCase();return D.products.find(function(p){return p.metal===m&&p.sku.toUpperCase()===s;});}
-function qoSku(){var i=document.getElementById('qo_skuinfo');if(!i)return;var p=qoFind();i.textContent=p?p.name+(p.gram?' · '+p.gram+' g':''):(fv('qo_sku')?'Not found for this metal':'');}
+ var s=document.getElementById('qo_sku');if(s){s.placeholder='Search '+m.toLowerCase()+' SKU or name';QO.pick=null;qoSku();}}
+function qoFind(){var m=(document.querySelector('input[name=qo_m]:checked')||{}).value;if(QO.pick){var p=D.products.find(function(x){return x.metal===m&&x.id===QO.pick;});if(p)return p;}var s=fv('qo_sku').toUpperCase();return s?D.products.find(function(p){return p.metal===m&&p.sku.toUpperCase()===s;}):null;}
+function qoSku(){var r=document.getElementById('qo_res'), sel=document.getElementById('qo_sel'), inp=document.getElementById('qo_sku');if(!r)return;
+ var m=(document.querySelector('input[name=qo_m]:checked')||{}).value;
+ if(!m){r.innerHTML='<div class="muted" style="padding:10px 4px">Choose the metal first</div>';return;}
+ var q=fv('qo_sku').toLowerCase();if(QO.pick){var cp=D.products.find(function(x){return x.id===QO.pick;});if(!cp||cp.sku.toLowerCase()!==q)QO.pick=null;}
+ if(QO.pick){r.innerHTML='';return;}sel.innerHTML='';inp.style.display='';
+ var list=D.products.filter(function(p){return p.metal===m&&(!q||(p.sku+' '+p.name).toLowerCase().indexOf(q)>=0);});
+ list.sort(function(a,b){var x=a.sku.toLowerCase().indexOf(q)===0?0:1,y=b.sku.toLowerCase().indexOf(q)===0?0:1;return x-y||a.sku.localeCompare(b.sku);});
+ var n=list.length;list=list.slice(0,40);
+ r.innerHTML=list.length?list.map(function(p){return '<button type="button" class="qo-item" onclick="qoPick(\''+esc(p.id)+'\')">'+thumb(p.img,p.metal,p.sku,52)+'<span class="qo-it"><b>'+esc(p.sku)+'</b><span>'+esc(p.name)+'</span></span><span class="muted" style="white-space:nowrap">'+(p.gram?num(p.gram,2)+' g':'')+'</span></button>';}).join('')+(n>40?'<div class="muted" style="padding:8px 4px">'+(n-40)+' more · type to narrow down</div>':''):'<div class="muted" style="padding:10px 4px">No '+m.toLowerCase()+' product matches</div>';
+ fillImgs();}
+function qoPick(id){var p=D.products.find(function(x){return x.id===id;});if(!p)return;QO.pick=id;var inp=document.getElementById('qo_sku');inp.value=p.sku;inp.style.display='none';
+ document.getElementById('qo_res').innerHTML='';
+ document.getElementById('qo_sel').innerHTML='<div class="qo-pickd">'+thumb(p.img,p.metal,p.sku,84)+'<div style="flex:1;min-width:0"><b style="font-size:16px">'+esc(p.sku)+'</b><div class="muted">'+esc(p.name)+'</div><div class="muted">'+esc([p.gram?num(p.gram,2)+' g/pc':'',p.stones,p.color].filter(Boolean).join(' · '))+'</div></div><button type="button" class="btn ghost sm" onclick="qoUnpick()">Change</button></div>';}
+function qoUnpick(){QO.pick=null;var inp=document.getElementById('qo_sku');inp.value='';inp.style.display='';document.getElementById('qo_sel').innerHTML='';inp.focus();qoSku();}
 function qoPrev(el){var t=document.getElementById('qo_ptxt'), b=document.getElementById('qo_pbox');var f=el.files&&el.files[0];if(!f){return;}
  var u=URL.createObjectURL(f);t.innerHTML='<img src="'+u+'" alt="Selected photo"><span>'+esc(f.name)+' · tap to change</span>';b.classList.add('has');}
 function saveQuick(){var m=(document.querySelector('input[name=qo_m]:checked')||{}).value, sku=QO.mode==='sku', p=null, miss='';
@@ -553,7 +571,7 @@ var IMGC={};
 function applyImgs(){if(!D)return 0;var n=0;D.lines.concat(D.products,D.basket||[]).forEach(function(x){if(!x.img&&x.photo&&IMGC[x.photo]){x.img=IMGC[x.photo];n++;}});return n;}
 function fillImgs(){if(!D)return;if(applyImgs())draw(true);var need=[];D.lines.concat(D.products,D.basket||[]).forEach(function(x){if(!x.img&&x.photo&&IMGC[x.photo]===undefined&&need.indexOf(x.photo)<0)need.push(x.photo);});
  for(var i=0,ch=[];i<need.length;i+=30)ch.push(need.slice(i,i+30));
- ch.reduce(function(pr,c){return pr.then(function(){return post({op:'img',paths:c}).then(function(r){c.forEach(function(k){IMGC[k]=(r&&r.imgs||{})[k]||'';});if(applyImgs())draw(true);}).catch(function(){});});},Promise.resolve());}
+ ch.reduce(function(pr,c){return pr.then(function(){return post({op:'img',paths:c}).then(function(r){c.forEach(function(k){IMGC[k]=(r&&r.imgs||{})[k]||'';});if(applyImgs()){draw(true);if(document.getElementById('qo_res')&&!QO.pick)qoSku();}}).catch(function(){});});},Promise.resolve());}
 function fail(msg){if(D){setSync('Could not refresh. Showing data from '+D.at+'.');return;}document.getElementById('main').innerHTML='<div class="card"><h2 class="h2">Could not load data</h2><p class="muted">'+esc(msg)+'</p><button class="btn" onclick="load()">Try again</button></div>';}
 function setSync(t){var s=document.getElementById('sync');if(!s){s=document.createElement('div');s.id='sync';s.setAttribute('role','status');s.style.cssText='position:fixed;right:16px;bottom:16px;background:#14161C;color:#fff;font-size:13px;padding:10px 14px;border-radius:12px;z-index:9;display:none';document.body.appendChild(s);}s.textContent=t;s.style.display=t?'block':'none';}
 function post(body,done){if(D&&D.role==='view'&&!/^(img|pdf)$/.test(body.op))return Promise.reject(new Error('View-only access: you can look but not change data'));body.key=store('hubKey');return fetch(API,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json();}).then(function(j){if(!j.ok)throw new Error(j.error);return j.result;});}
