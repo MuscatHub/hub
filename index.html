@@ -258,7 +258,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-27-48';
+var APPV='2026-11-27-49';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -676,7 +676,7 @@ function pdfBtn(el,kind,ref){var w=window.open('','_blank');if(w){w.document.wri
 /* visual order form: one high-res JPG collage, quantity on top of each photo */
 function ovPlating(l){var c=String(l.goldColor||l.color||'')+' '+String(l.name||''),s=String(l.sku||'');
  if(l.metal==='Silver'){if(/gold\s*plated|\bGP\b|yald/i.test(c)||/G$/.test(s))return 'Yaldız';if(/rose/i.test(c)||/R$/.test(s))return 'Rose';return 'Rodaj';}
- if(/white|beyaz/i.test(c))return 'Beyaz altın';if(/rose|pink/i.test(c))return 'Rose altın';return 'Sarı altın';}
+ if(/white|beyaz/i.test(c))return 'Beyaz altın';if(/rose|pink/i.test(c))return 'Rose altın';return 'Yeşil altın';}
 var OVPL=/\s*·?\s*(silver \(rhodium\)|gold plated \(gp\)|gold plated|\(gp\)|rhodium|\bsilver\b|\bGP\b|\bS\b(?=\s*$))/gi;
 function ovClean(t){return String(t||'').replace(OVPL,'').replace(/\s*·\s*$/,'').replace(/^\s*·\s*/,'').replace(/\s*·\s*·\s*/g,' · ').trim();}
 function ovKey(l){var base=l.sku?String(l.sku).replace(/[GSRWY]$/,''):ovClean(l.name).toLowerCase();return base+'|'+(l.size||'');}
