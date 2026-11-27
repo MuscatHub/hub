@@ -258,7 +258,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-27-45';
+var APPV='2026-11-27-46';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -690,7 +690,7 @@ function ovLoad(groups){var need=[],big={};
  .then(function(){groups.forEach(function(g){var ims=g.vars.filter(function(v){return v.im;});var u={};g.ims=ims.filter(function(v){var k=v.im.src;if(u[k])return false;u[k]=1;return true;});g.im=g.ims[0]&&g.ims[0].im;});});}
 function ovWrap(x,t,maxW){var w=String(t||'').split(/\s+/),out=[],cur='';w.forEach(function(s){var n=cur?cur+' '+s:s;if(x.measureText(n).width>maxW&&cur){out.push(cur);cur=s;}else cur=n;});if(cur)out.push(cur);return out;}
 function ovRound(x,X,Y,W,H,r){x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+W,Y,X+W,Y+H,r);x.arcTo(X+W,Y+H,X,Y+H,r);x.arcTo(X,Y+H,X,Y,r);x.arcTo(X,Y,X+W,Y,r);x.closePath();}
-function ovUp(t){return String(t||'').toLocaleUpperCase('tr-TR');}
+function ovUp(t){return String(t||'').toLocaleUpperCase('tr-TR').replace(/MİLK/g,'MILK');}
 function ovDate(d){var m=String(d||'').match(/^(\d{4})-(\d{2})-(\d{2})/);return m?m[3]+'.'+m[2]+'.'+m[1]:String(d||'');}
 function orderVisual(no,el){var o=D.orders.find(function(x){return x.no===no;});var ls=D.lines.filter(function(l){return l.order===no&&l.ordered>0;});if(!o||!ls.length){toast('No products in this order');return;}
  var w=window.open('','_blank');if(w)w.document.write('<p style="font-family:Arial;padding:24px">Building the visual order form… this can take up to a minute.</p>');
