@@ -258,7 +258,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-27-49';
+var APPV='2026-11-27-50';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -577,11 +577,14 @@ function load(){checkVer();var m=location.hash.match(/k=([^&]+)/);if(m){store('h
  setSync('Updating…');
  fetch(API+'?api='+encodeURIComponent(key)).then(function(r){return r.json();}).then(function(j){
   if(!j.ok){if(/access/i.test(j.error)){store('hubKey',null);store('hubData',null);D=null;keyForm('That key did not work. Try again.');}else fail(j.error);return;}
-  D=j.data;store('hubData',JSON.stringify(D));draw(true);setSync('');fillImgs();
+  D=j.data;prefPhoto();store('hubData',JSON.stringify(D));draw(true);setSync('');fillImgs();
  }).catch(function(e){fail(e&&e.message||e);});}
+/* catalog: a photo uploaded in the app wins over the website image link (same as the AppSheet app) */
+function prefPhoto(){if(!D||!D.products)return;var up={};D.products.forEach(function(p){if(p.photo&&p.img&&/^http/.test(p.img)){up[p.metal+'|'+p.sku]={photo:p.photo,web:p.img};p.web=p.img;p.img=IMGC[p.photo]||'';}});
+ (D.lines||[]).forEach(function(l){var u=l.sku&&up[l.metal+'|'+l.sku];if(u&&!l.photo&&(!l.img||l.img===u.web)){l.photo=u.photo;l.img=IMGC[u.photo]||'';}});}
 /* Drive photos (customer photos, catalog photos without a web link) come through the script as data URLs */
 var IMGC={};
-function applyImgs(){if(!D)return 0;var n=0;D.lines.concat(D.products,D.basket||[]).forEach(function(x){if(!x.img&&x.photo&&IMGC[x.photo]){x.img=IMGC[x.photo];n++;}});return n;}
+function applyImgs(){if(!D)return 0;var n=0;D.lines.concat(D.products,D.basket||[]).forEach(function(x){if(!x.img&&x.photo&&IMGC[x.photo]){x.img=IMGC[x.photo];n++;}else if(!x.img&&x.web&&IMGC[x.photo]===''){x.img=x.web;n++;}});return n;}
 function fillImgs(){if(!D)return;if(applyImgs())draw(true);var need=[];D.lines.concat(D.products,D.basket||[]).forEach(function(x){if(!x.img&&x.photo&&IMGC[x.photo]===undefined&&need.indexOf(x.photo)<0)need.push(x.photo);});
  for(var i=0,ch=[];i<need.length;i+=30)ch.push(need.slice(i,i+30));
  ch.reduce(function(pr,c){return pr.then(function(){return post({op:'img',paths:c}).then(function(r){c.forEach(function(k){IMGC[k]=(r&&r.imgs||{})[k]||'';});if(applyImgs()){draw(true);if(document.getElementById('qo_res')&&!QO.pick)qoSku();}}).catch(function(){});});},Promise.resolve());}
@@ -808,7 +811,7 @@ function openProduct(metal,id,mode){var p=metal?D.products.find(function(x){retu
   +'<label class="fld">Gram / pc<input class="inp" type="number" min="0" step="0.01" id="pr_g" value="'+v(p.gram)+'"></label>'
   +'<input type="hidden" id="pr_lab" value="'+v(p.labor)+'"><input type="hidden" id="pr_sp" value="'+v(p.stonePc)+'"><input type="hidden" id="pr_setp" value="'+v(p.settingPc)+'">'
   +'<label class="fld gold-only" style="grid-column:span 2">Notes<input class="inp" id="pr_notes" value="'+v(p.notes)+'"></label>'
-  +'<label class="fld" style="grid-column:1/-1">Image URL<input class="inp" id="pr_img" value="'+v(p.img)+'" placeholder="https://…"></label>'
+  +'<label class="fld" style="grid-column:1/-1">Image URL<input class="inp" id="pr_img" value="'+v(p.web||(/^https?:/.test(p.img||'')?p.img:''))+'" placeholder="https://…"></label>'
   +'<label class="fld" style="grid-column:1/-1">or upload a photo<input class="inp" style="padding-top:8px" type="file" id="pr_photo" accept="image/*"></label>'
   +'<div id="pr_spec" style="grid-column:1/-1"></div></div>'
   +'<datalist id="dl_cat">'+Array.from(new Set(D.products.map(function(x){return x.cat;}).filter(Boolean))).sort().map(function(c){return '<option value="'+esc(c)+'">';}).join('')+'</datalist>';
