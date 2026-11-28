@@ -258,7 +258,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-27-51';
+var APPV='2026-11-28-52';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -709,16 +709,16 @@ function orderVisual(no,el){var o=D.orders.find(function(x){return x.no===no;});
  var TR={};
  post({op:'tr',texts:texts}).then(function(r){TR=(r&&r.tr)||{};}).catch(function(){}).then(function(){return ovLoad(groups);}).then(function(){
   var T=function(t){return ovUp(TR[t]||t);};
-  var n=groups.length, cols=n<=1?1:n<=4?2:n<=9?3:n<=16?4:n<=30?5:6, W=3000, pad=46, cw=Math.floor((W-pad*(cols+1))/cols), imgH=cw, txtH=Math.round(cw*0.28), ch=imgH+txtH, rows=Math.ceil(n/cols);
+  var n=groups.length, cols=Math.min(5,Math.max(1,n)), PER=cols*5, NP=Math.ceil(n/PER), W=3000, pad=46, cw=Math.floor((W-pad*(cols+1))/cols), imgH=cw, txtH=Math.round(cw*0.28), ch=imgH+txtH;
   var c=document.createElement('canvas'),x=c.getContext('2d');x.font='bold 54px Arial';var nlines=onote?ovWrap(x,'NOT: '+T(onote),W-2*pad).slice(0,2):[];
-  var head=300+nlines.length*70, H=head+rows*(ch+pad)+pad;var ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),mob=ios||/Android|Mobi/.test(navigator.userAgent),SC=Math.max(1,Math.min(cols>=4?2.2:cols>=3?1.8:1.4,Math.sqrt((ios?16e6:mob?30e6:64e6)/(W*H))));c.width=Math.round(W*SC);c.height=Math.round(H*SC);x=c.getContext('2d');x.scale(SC,SC);x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.textBaseline='top';
+  var head=300+nlines.length*70;var tot=ls.reduce(function(a,l){return a+l.ordered;},0);var pages=[];for(var pg=0;pg<NP;pg++)pages.push(groups.slice(pg*PER,pg*PER+PER));
+  return Promise.all(pages.map(function(pgs,pi){var rows=Math.ceil(pgs.length/cols),H=head+rows*(ch+pad)+pad;c=document.createElement('canvas');var ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1),mob=ios||/Android|Mobi/.test(navigator.userAgent),SC=Math.max(1,Math.min(cols>=4?2.2:cols>=3?1.8:1.4,Math.sqrt((ios?16e6:mob?30e6:64e6)/(W*H))));c.width=Math.round(W*SC);c.height=Math.round(H*SC);x=c.getContext('2d');x.scale(SC,SC);x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.textBaseline='top';
   x.fillStyle='#F3F1EA';x.fillRect(0,0,W,H);x.fillStyle='#14161C';x.fillRect(0,0,W,head-30);
-  var tot=ls.reduce(function(a,l){return a+l.ordered;},0);
   x.fillStyle='#E2B53E';x.font='bold 130px Arial';x.fillText(o.no,pad,40);
   x.fillStyle='#fff';x.font='bold 66px Arial';x.fillText([o.usta?ovUp(o.usta)+' SİPARİŞ':'SİPARİŞ',o.metal==='Silver'?'925 GÜMÜŞ':'ALTIN','TOPLAM '+tot+' ADET'].join('  ·  '),pad,190);
-  x.textAlign='right';x.fillStyle='#E2B53E';x.font='bold 70px Arial';x.fillText('TERMİN: '+ovDate(o.due),W-pad,60);x.textAlign='left';
+  x.textAlign='right';x.fillStyle='#E2B53E';x.font='bold 70px Arial';x.fillText('TERMİN: '+ovDate(o.due),W-pad,60);if(NP>1){x.fillStyle='#fff';x.font='bold 54px Arial';x.fillText('SAYFA '+(pi+1)+' / '+NP,W-pad,160);}x.textAlign='left';
   x.fillStyle='#F6C744';x.font='bold 54px Arial';nlines.forEach(function(s,k){x.fillText(s+(k===1&&ovWrap(x,'NOT: '+T(onote),W-2*pad).length>2?' …':''),pad,280+k*70);});
-  groups.forEach(function(g,i){var r=Math.floor(i/cols),cc=i%cols,X=pad+cc*(cw+pad),Y=head+pad+r*(ch+pad), l=g.lines[0];
+  pgs.forEach(function(g,i){var r=Math.floor(i/cols),cc=i%cols,X=pad+cc*(cw+pad),Y=head+pad+r*(ch+pad), l=g.lines[0];
    x.save();ovRound(x,X,Y,cw,ch,28);x.fillStyle='#fff';x.fill();x.clip();
    if(g.ims&&g.ims.length>1){var k2=g.ims.length,top=Math.round(cw*(cols>=5?0.085:0.075)*(0.95+Object.keys(g.v).length*1.18))+14,lf=Math.round(cw*0.045),wide=g.ims.every(function(v){return v.im.naturalWidth/v.im.naturalHeight>1.6;});
      g.ims.forEach(function(v,q){var bx2,by2,bw2,bh2;if(wide){bh2=(imgH-top-8)/k2;bx2=X;by2=Y+top+q*bh2;bw2=cw;}else{bw2=cw/k2;bx2=X+q*bw2;by2=Y+top;bh2=imgH-top-8;}
@@ -738,10 +738,10 @@ function orderVisual(no,el){var o=D.orders.find(function(x){return x.no===no;});
    if(l1){x.fillStyle='#14161C';x.font='bold '+tf+'px Arial';x.fillText(l1,X+28,ty);ty+=tf*1.25;}
    x.fillStyle='#374151';x.font='bold '+Math.round(tf*0.85)+'px Arial';var d=g.t2?T(g.t2):T(g.t1);
    ovWrap(x,d,cw-56).slice(0,l1?2:3).forEach(function(s2,j){x.fillText(s2,X+28,ty+j*tf*1.02);});});
-  return new Promise(function(res){c.toBlob(res,'image/jpeg',0.9);});})
- .then(function(b){el.style.opacity=1;el.style.pointerEvents='';var url=URL.createObjectURL(b),fn=no+'_siparis_gorseli.jpg';
-  if(w){w.document.open();w.document.write('<title>'+fn+'</title><body style="margin:0;background:#222;text-align:center;font-family:Arial"><div style="padding:12px"><a href="'+url+'" download="'+fn+'" style="background:#E2B53E;color:#14161C;padding:12px 20px;border-radius:10px;font-weight:bold;text-decoration:none;display:inline-block">Download JPG</a></div><img src="'+url+'" style="max-width:100%;height:auto"></body>');w.document.close();}
-  else{var a=document.createElement('a');a.href=url;a.download=fn;a.click();}})
+  var cc2=c;return new Promise(function(res){cc2.toBlob(res,'image/jpeg',0.9);});}));})
+ .then(function(bs){el.style.opacity=1;el.style.pointerEvents='';var many=bs.length>1,its=bs.map(function(b,k){return {url:URL.createObjectURL(b),fn:no+'_siparis_gorseli'+(many?'_sayfa'+(k+1):'')+'.jpg'};});
+  if(w){var btn='background:#E2B53E;color:#14161C;padding:12px 20px;border-radius:10px;font-weight:bold;text-decoration:none;display:inline-block;margin:4px';w.document.open();w.document.write('<title>'+no+' sipariş görseli</title><body style="margin:0;background:#222;text-align:center;font-family:Arial">'+its.map(function(it,k){return '<div style="padding:12px"><a href="'+it.url+'" download="'+it.fn+'" style="'+btn+'">Download JPG'+(many?' · Sayfa '+(k+1)+'/'+its.length:'')+'</a></div><img src="'+it.url+'" style="max-width:100%;height:auto;display:block;margin:0 auto 24px">';}).join('')+'</body>');w.document.close();}
+  else its.forEach(function(it){var a=document.createElement('a');a.href=it.url;a.download=it.fn;a.click();});})
  .catch(function(e){el.style.opacity=1;el.style.pointerEvents='';if(w)w.close();toast('Visual failed: '+(e.message||e));});}
 
 /* several orders' usta forms in one PDF, one under another */
