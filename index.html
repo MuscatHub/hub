@@ -235,6 +235,7 @@ body.ro .stepb{pointer-events:none}
  .modal [style*="justify-content:flex-end"]{position:sticky;bottom:calc(-18px - env(safe-area-inset-bottom));background:#fff;padding:12px 0 4px;margin-bottom:-4px}
  /* production entry rows as cards */
  .ptable thead{display:none}
+.ptable tr.pwg td::before{content:none!important;display:none!important}
  .ptable,.ptable tbody{display:block}
  .ptable tr{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;padding:12px 0;border-bottom:1px solid #EEF0F4}
  .ptable td{border:0;padding:0;text-align:left!important;font-size:13px}
@@ -258,7 +259,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-28-56';
+var APPV='2026-11-28-57';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -618,14 +619,23 @@ function openProd(orderNo,focus){var o=D.orders.find(function(x){return x.no===o
  if(!readyCount(orderNo)){toast('No product of '+orderNo+' is Ready yet. Mark it Ready first.');return;}
  var h=mhead('Production entry · '+esc(o.no),esc([o.cust,o.usta,o.metal].filter(Boolean).join(' · '))+' · enter what is produced now (not shipped yet)')+'<p class="note">Only products marked <b>Ready</b> can be entered. The others are locked until you mark them Ready.</p>';
  h+='<div style="max-height:56vh;overflow:auto;border:1px solid #EEF0F4;border-radius:14px"><table class="ptable"><thead><tr><th>Product</th><th style="text-align:right">Ordered</th><th style="text-align:right">Shipped before</th><th style="text-align:right">This batch (pcs)</th>'+(ls.some(function(l){return l.metal!=='Silver';})?'<th style="text-align:right">Grams</th><th style="text-align:right">Stone ct</th>':'')+'</tr></thead><tbody>';
- ls.forEach(function(l){var before=Math.max(0,l.shipped-l.openQty), gold=l.metal!=='Silver', rd=stageOf(l)===6, dis=rd?'':' disabled style="opacity:.45"';
-  h+='<tr'+(l.id===focus?' class="sel"':'')+'><td><div style="display:flex;align-items:center;gap:10px">'+thumb(l.img,l.metal,l.sku,36)+'<div><b>'+esc(l.sku||'No SKU')+'</b>'+(rd?'':' <span class="chip c-pro" style="height:20px;font-size:11px">Not ready</span>')+'<div class="muted" style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(l.name)+'</div></div></div></td><td style="text-align:right">'+num(l.ordered)+'</td><td style="text-align:right">'+num(before)+'</td>'
-   +'<td style="text-align:right"><input class="inp sm" type="number" min="0" step="1" inputmode="numeric" aria-label="'+esc(l.sku)+' pieces" id="pq_'+l.id+'" value="'+(l.openQty||'')+'" placeholder="0"'+dis+'></td>'
+ var hasGold=ls.some(function(l){return l.metal!=='Silver';}), PWG=[], pwm={}, sm=o.silverModels||{};
+ ls.forEach(function(l){if(l.metal!=='Silver')return;var k=pwKey(l);if(!pwm[k]){pwm[k]={key:k,name:String(l.name||'').trim(),size:String(l.size||'').trim(),lines:[]};PWG.push(pwm[k]);}pwm[k].lines.push(l);});
+ window.PW={order:orderNo,groups:PWG};
+ var rows=ls.filter(function(l){return l.metal!=='Silver';}).map(function(l){return {l:l};});PWG.forEach(function(g,gi){rows.push({g:g,gi:gi});g.lines.forEach(function(l){rows.push({l:l,gi:gi});});});
+ rows.forEach(function(rw){if(rw.g){var g=rw.g,gi=rw.gi,anyRd=g.lines.some(function(x){return stageOf(x)===6;}),st=sm[g.key],nm=g.name+(g.size&&g.name.toLowerCase().indexOf(g.size.toLowerCase())<0?' · size '+g.size:'');
+   h+='<tr class="pwg" style="background:#F6F7FA"><td colspan="2" style="padding-left:12px"><b>'+esc(nm||'Model')+'</b><div class="muted" style="font-size:12px">'+g.lines.length+' products · '+esc(g.lines.map(function(x){return x.sku;}).filter(Boolean).join(', '))+'</div></td><td style="text-align:right;font-size:12px" class="muted" id="pwi_'+gi+'"></td><td style="text-align:right"><input class="inp sm" type="number" min="0" step="0.01" inputmode="decimal" aria-label="'+esc(nm)+' grams" placeholder="Grams" id="pw_'+gi+'" value="'+(st&&st.grams?st.grams:'')+'" oninput="pwx()"'+(anyRd?'':' disabled style="opacity:.45"')+'></td>'+(hasGold?'<td></td><td></td>':'')+'</tr>';return;}
+  var l=rw.l;var before=Math.max(0,l.shipped-l.openQty), gold=l.metal!=='Silver', rd=stageOf(l)===6, dis=rd?'':' disabled style="opacity:.45"';
+  h+='<tr'+(rw.gi!==undefined?' class="pwl"':'')+''+(l.id===focus?' class="sel"':'')+'><td><div style="display:flex;align-items:center;gap:10px">'+thumb(l.img,l.metal,l.sku,36)+'<div><b>'+esc(l.sku||'No SKU')+'</b>'+(rd?'':' <span class="chip c-pro" style="height:20px;font-size:11px">Not ready</span>')+'<div class="muted" style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(l.name)+'</div></div></div></td><td style="text-align:right">'+num(l.ordered)+'</td><td style="text-align:right">'+num(before)+'</td>'
+   +'<td style="text-align:right"><input class="inp sm" type="number" min="0" step="1" inputmode="numeric" aria-label="'+esc(l.sku)+' pieces" id="pq_'+l.id+'" value="'+(l.openQty||'')+'" placeholder="0"'+(gold?'':' oninput="pwx()"')+dis+'></td>'
    +(gold?'<td style="text-align:right"><input class="inp sm" type="number" min="0" step="0.01" inputmode="decimal" aria-label="'+esc(l.sku)+' grams" id="pg_'+l.id+'" value="'+(l.openGrams||'')+'"'+dis+'></td><td style="text-align:right"><input class="inp sm" type="number" min="0" step="0.01" inputmode="decimal" aria-label="'+esc(l.sku)+' stone carat" id="pc_'+l.id+'" value="'+(l.openCarat||'')+'"'+dis+'></td>':(ls.some(function(x){return x.metal!=='Silver';})?'<td></td><td></td>':''))+'</tr>';});
  h+='</tbody></table></div>';
- if(silver)h+='<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;margin-top:16px;background:#F6F7FA;border-radius:14px;padding:14px"><div><div class="muted">Silver this batch (order total)</div><b style="font-family:Manrope,sans-serif;font-size:20px">'+gr(openG)+'</b></div><label class="fld">Add grams<input class="inp" style="width:130px" type="number" min="0" step="0.01" inputmode="decimal" id="p_add" placeholder="0.00" oninput="pgx()"'+(silverReady?'':' disabled data-lock="1"')+'></label><label class="fld">or correct total<input class="inp" style="width:130px" type="number" min="0" step="0.01" inputmode="decimal" id="p_set" placeholder="'+num(openG,2)+'" oninput="pgx()"'+(silverReady?'':' disabled data-lock="1"')+'></label><div class="muted" style="flex:1 1 200px">Silver grams are kept on the order, not split over products.</div></div>';
+ var smSum=Object.keys(sm).reduce(function(t,k){return t+(Number(sm[k].grams)||0);},0), other=Math.max(0,Math.round((openG-smSum)*100)/100);
+ if(silver)h+='<div style="display:flex;flex-wrap:wrap;align-items:flex-end;gap:16px;margin-top:16px;background:#F6F7FA;border-radius:14px;padding:14px"><div><div class="muted">Silver this batch (order total)</div><b style="font-family:Manrope,sans-serif;font-size:20px" id="pw_tot">'+gr(openG)+'</b><div class="muted" style="font-size:12px" id="pw_pcs"></div></div>'+(other>0.004?'<label class="fld">Earlier entry (not by model)<input class="inp" style="width:130px" type="number" min="0" step="0.01" inputmode="decimal" id="pw_other" value="'+other+'" oninput="pwx()"></label>':'')+'<div class="muted" style="flex:1 1 220px">Weigh each model (all colours / plating together) and enter its grams on the model row. The order total is the sum.</div></div>';
  h+='<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:18px"><button class="btn ghost" onclick="closeModal()">Cancel</button><button class="btn gold" id="p_save" onclick="saveProd(\''+orderNo+'\')">Save production</button></div>';
- modal(h);var f=focus&&document.getElementById('pq_'+focus);if(f&&!f.disabled)f.focus();}
+ modal(h);pwx();var f=focus&&document.getElementById('pq_'+focus);if(f&&!f.disabled)f.focus();}
+function pwKey(l){return String(l.name||'').toLowerCase().replace(/\s+/g,' ').trim()+'|'+String(l.size||'').toLowerCase().trim();}
+function pwx(){var P=window.PW;if(!P)return;var tot=0,tp=0;P.groups.forEach(function(g,gi){var pcs=g.lines.reduce(function(a,l){var v=Number(fv('pq_'+l.id)||0);return a+(v>0?v:0);},0),gv=fv('pw_'+gi),gn=Number(gv||0),el=document.getElementById('pwi_'+gi);tot+=gn>0?gn:0;tp+=pcs;if(el)el.innerHTML=num(pcs)+' pcs'+(gn>0&&pcs>0?'<br><b style="color:#14161C">'+(gn/pcs).toFixed(2)+' g/pc</b>':'');});var ot=Number(fv('pw_other')||0);tot+=ot>0?ot:0;var t=document.getElementById('pw_tot');if(t)t.textContent=gr(Math.round(tot*100)/100);var pp=document.getElementById('pw_pcs');if(pp)pp.textContent=num(tp)+' pcs'+(tot>0&&tp>0?' · avg '+(tot/tp).toFixed(2)+' g/pc':'');}
 function pgx(){var a=document.getElementById('p_add'),b=document.getElementById('p_set');if(!a||!b||a.hasAttribute('data-lock'))return;var av=a.value!=='',bv=b.value!=='';b.disabled=av;a.disabled=bv&&!av;}
 function saveProd(orderNo){var ls=D.lines.filter(function(l){return l.order===orderNo;}), out=[], bad=null;
  ls.forEach(function(l){if(stageOf(l)!==6)return;var q=fv('pq_'+l.id), g=fv('pg_'+l.id), c=fv('pc_'+l.id);var qn=q===''?0:Number(q);
@@ -633,9 +643,13 @@ function saveProd(orderNo){var ls=D.lines.filter(function(l){return l.order===or
   var ch=qn!==(l.openQty||0)||(l.metal!=='Silver'&&((g!==''&&Number(g)!==(l.openGrams||0))||(c!==''&&Number(c)!==(l.openCarat||0))));
   if(ch){var x={lineId:l.id,qty:qn};if(l.metal!=='Silver'){if(g!=='')x.grams=Number(g);if(c!=='')x.carat=Number(c);}out.push(x);}});
  if(bad){toast('Pieces must be whole numbers ('+(bad.sku||'product')+')');var e=document.getElementById('pq_'+bad.id);if(e)e.focus();return;}
- var add=Number(fv('p_add')||0), setv=fv('p_set');if(!(add>=0)||(setv!==''&&!(Number(setv)>=0))){toast('Grams must be 0 or more');return;}if(!out.length&&!add&&setv===''){closeModal();return;}
+ var o=D.orders.find(function(x){return x.no===orderNo;})||{}, P=window.PW&&window.PW.order===orderNo?window.PW:{groups:[]}, models={}, tot=0, neg=false, mch=false, sm=o.silverModels||{};
+ P.groups.forEach(function(g,gi){var v=fv('pw_'+gi);if(v===''){if(sm[g.key])mch=true;return;}var n=Number(v);if(!(n>=0)){neg=true;return;}var pcs=g.lines.reduce(function(a,l){var q=Number(fv('pq_'+l.id)||0);return a+(q>0?q:0);},0);
+  models[g.key]={name:g.name,size:g.size,skus:g.lines.map(function(l){return l.sku;}).filter(Boolean).join(', '),pcs:pcs,grams:n,avg:pcs?Math.round(n/pcs*100)/100:''};tot+=n;if(!sm[g.key]||Number(sm[g.key].grams)!==n||Number(sm[g.key].pcs)!==pcs)mch=true;});
+ var ov=fv('pw_other');if(ov!==''){var on=Number(ov);if(!(on>=0))neg=true;else tot+=on;}if(neg){toast('Grams must be 0 or more');return;}tot=Math.round(tot*100)/100;
+ var gch=P.groups.length&&(mch||Math.abs(tot-(o.silverOpen||0))>0.004);if(!out.length&&!gch){closeModal();return;}
  busyBtn('p_save','Saving…');
- post({op:'production',order:orderNo,lines:out,addGrams:add,setGrams:setv}).then(function(r){closeModal();toast(orderNo+' saved'+(r.batch?' · silver batch '+num(r.batch.open,2)+' g':''));load();})
+ post(gch?{op:'production',order:orderNo,lines:out,setGrams:tot,models:models}:{op:'production',order:orderNo,lines:out}).then(function(r){closeModal();toast(orderNo+' saved'+(r.batch?' · silver batch '+num(r.batch.open,2)+' g':''));load();})
  .catch(function(e){var b=document.getElementById('p_save');if(b){b.disabled=false;b.style.opacity=1;b.textContent='Save production';}toast('Not saved: '+(e.message||e));});}
 
 /* setting info (gold, stage 4) */
