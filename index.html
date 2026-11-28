@@ -258,7 +258,7 @@ body.ro .stepb{pointer-events:none}
 <main class="main" id="main"><div class="loading"><div class="spin"></div>Loading Muscat Hub…</div></main>
 </div>
 <script>
-var APPV='2026-11-28-53';
+var APPV='2026-11-28-54';
 function checkVer(){try{fetch(location.pathname+'?nc='+Date.now(),{cache:'no-store'}).then(function(r){return r.text();}).then(function(t){var m=t.match(/var APPV='([^']+)'/);if(!m||m[1]===APPV||sessionStorage.getItem('appv_try')===m[1])return;if(document.querySelector('.modal')){window._verWait=m[1];return;}sessionStorage.setItem('appv_try',m[1]);location.replace(location.pathname+'?v='+encodeURIComponent(m[1])+location.hash);}).catch(function(){});}catch(e){}}
 checkVer();setInterval(checkVer,120000);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(function(){});document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')checkVer();});window.addEventListener('focus',checkVer);
 var D=null, S={busy:{},page:'home', ordTab:'open', sel:null, prodTab:'all', prodQ:'', catTab:'all', q:'', open:{}};
@@ -708,7 +708,7 @@ function orderVisual(no,el){var o=D.orders.find(function(x){return x.no===no;});
   g.t1=ovClean(nm);g.t2=ex.length?ovClean(ex.join(' · ')):'';var pr=D.products.find(function(p){return p.sku===l.sku&&p.metal===l.metal;});g.t3=pr&&pr.stones?ovClean(String(pr.stones)):'';[g.t1,g.t2,g.t3].forEach(function(t){if(t&&texts.indexOf(t)<0)texts.push(t);});});
  var TR={};
  post({op:'tr',texts:texts}).then(function(r){TR=(r&&r.tr)||{};}).catch(function(){}).then(function(){return ovLoad(groups);}).then(function(){
-  var T=function(t){return ovUp(TR[t]||t);};
+  var T=function(t){return ovUp(TR[t]||t).replace(/BEYAZ KUVARS|WHITE QUARTZ/g,'MILK');};
   var n=groups.length, cols=Math.min(5,Math.max(1,n)), PER=cols*5, NP=Math.ceil(n/PER), W=3000, pad=46, cw=Math.floor((W-pad*(cols+1))/cols), imgH=cw, txtH=Math.round(cw*(groups.some(function(g){return g.t3;})?0.36:0.28)), ch=imgH+txtH;
   var c=document.createElement('canvas'),x=c.getContext('2d');x.font='bold 54px Arial';var nlines=onote?ovWrap(x,'NOT: '+T(onote),W-2*pad).slice(0,2):[];
   var head=300+nlines.length*70;var tot=ls.reduce(function(a,l){return a+l.ordered;},0);var pages=[];for(var pg=0;pg<NP;pg++)pages.push(groups.slice(pg*PER,pg*PER+PER));
